@@ -1,0 +1,50 @@
+.bg-primary-app{
+background-color: #FF8C00 !important;
+}
+
+.btn-primary-app {
+  color: #fff;
+  background-color: #e17c00;
+  border-color: #e17c00;
+}
+
+.btn-outline-primary-app {
+  color: #f9cc95;
+  border-color: #faa946;
+}
+
+.btn-outline-primary-app:hover {
+  color: #fff;
+  background-color: #cf7506;
+  border-color: #cf7506;
+}
+
+.btn-outline-primary-app:focus, .btn-outline-primary-app.focus {
+  box-shadow: 0 0 0 0.2rem rgba(231, 154, 59, 0.5);
+}
+
+/* Secondary colors */
+.bg-secondary-app{
+background-color: #00829F !important;
+}
+
+.btn-secondary-app {
+  color: #fff;
+  background-color: #07a7cb;
+  border-color: #07a7cb;
+}
+
+.btn-outline-secondary-app {
+  color: #07a7cb;
+  border-color: #07a7cb;
+}
+
+.btn-outline-secondary-app:hover {
+  color: #fff;
+  background-color: #07a7cb;
+  border-color: #07a7cb;
+}
+
+.btn-outline-secondary-app:focus, .btn-outline-secondary-app.focus {
+  box-shadow: 0 0 0 0.2rem rgba(59, 231, 225, 0.5);
+}

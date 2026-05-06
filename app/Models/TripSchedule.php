@@ -12,7 +12,10 @@ class TripSchedule extends Model
         'trip_id','date','departure_datetime','seats_available','status'
     ];
 
-    protected $dates = ['date','departure_datetime'];
+    protected $casts = [
+    'date'               => 'date',
+    'departure_datetime' => 'datetime',   
+];
 
     public function trip()
     {

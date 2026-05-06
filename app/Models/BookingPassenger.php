@@ -10,12 +10,15 @@ class BookingPassenger extends Model
 
     protected $fillable = [
         'booking_id',
-        'passenger_id',  // NEW — nullable, links to saved passenger
         'name',
         'phone',
         'gender',
+        'id_number',
         'seat_number',
-        'id_number',     // NEW
+        'trip_seat_id',
+        'return_seat_number',
+        'return_trip_seat_id',
+        'ticket_number',
     ];
 
     public function passenger()
@@ -26,5 +29,14 @@ class BookingPassenger extends Model
     public function booking()
     {
         return $this->belongsTo(Booking::class);
+    }
+    public function seat()
+    {
+        return $this->belongsTo(TripSeat::class, 'trip_seat_id');
+    }
+
+    public function returnSeat()
+    {
+        return $this->belongsTo(TripSeat::class, 'return_trip_seat_id');
     }
 }

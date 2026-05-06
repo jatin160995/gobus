@@ -17,6 +17,8 @@ class Trip extends Model
         'start_date' => 'date',
         'end_date' => 'date',
         'departure_datetime' => 'datetime',
+        'price'              => 'float',         
+        'round_trip_price'   => 'float',         
     ];
 
     public function route()

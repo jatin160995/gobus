@@ -40,8 +40,10 @@ class MtnPaymentService
         try {
             DB::beginTransaction();
 
-            $totalAmount = (float) $booking->total_price ?? $booking->total_amount;
-            $providerId  = $booking->provider_id;
+            $totalAmount = (int) round($booking->total_price ?? $booking->total_amount ?? 0);
+            $providerId = ($bookingType === 'bus')
+                ? $booking->trip->provider_id      // bus: booking → trip → provider_id
+                : $booking->provider_id; 
             $externalId  = 'GOBUS-' . strtoupper($bookingType) . '-' . $booking->id . '-' . time();
 
             // Create PaymentOrder
@@ -59,7 +61,7 @@ class MtnPaymentService
 
             // Create the 3 pending transaction records
             $splits = $this->calculateSplits($totalAmount, $bookingType, $booking);
-            $this->createPendingTransactions($order, $booking, $bookingType, $splits);
+            $this->createPendingTransactions($order, $booking, $bookingType, $splits, $providerId);
 
             // Call MTN API
             $referenceId = $this->collectionService->requestToPay(
@@ -106,7 +108,11 @@ class MtnPaymentService
     public function calculateSplits(float $totalAmount, string $bookingType, $booking): array
     {
         // Fetch fee settings (same keys used by Orange)
-        $commissionRate     = (float) ($booking->provider->commission_rate ?? 10);
+       if ($bookingType === 'bus') {
+            $commissionRate = (float) ($booking->trip->provider->commission_rate ?? 10);
+        } else {
+            $commissionRate = (float) ($booking->provider->commission_rate ?? 10);
+        }
         $insuranceBusFee    = (float) Setting::getValue('insurance_bus_fee', 100);
         $insuranceCarPct    = (float) Setting::getValue('insurance_car_percentage', 2.2);
         $vatPct             = (float) Setting::getValue('vat_tax_percentage', 19.25);
@@ -115,7 +121,7 @@ class MtnPaymentService
             $insuranceAmount = round(($totalAmount * $insuranceCarPct) / 100, 2);
         } else {
             // For bus: insurance is a flat fee per booking
-            $passengerCount  = $booking->passengers()->count() ?? 1;
+            $passengerCount = $booking->passenger_count ?: 1;
             $insuranceAmount = $insuranceBusFee * $passengerCount;
         }
 
@@ -138,8 +144,10 @@ class MtnPaymentService
         PaymentOrder $order,
         $booking,
         string $bookingType,
-        array $splits
+        array $splits,
+         int $providerId 
     ): void {
+        
         // 1. Provider payout
         PaymentTransaction::create([
             'transaction_reference' => 'TXN-MTN-' . uniqid(),
@@ -148,7 +156,7 @@ class MtnPaymentService
             'booking_type'          => $bookingType,
             'transaction_type'      => 'provider_payout',
             'recipient_type'        => 'provider',
-            'recipient_id'          => $booking->provider_id,
+            'recipient_id'          => $providerId,
             'amount'                => $splits['provider_amount'],
             'currency'              => 'XAF',
             'payment_method'        => 'mtn_momo',

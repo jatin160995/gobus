@@ -55,15 +55,52 @@ class MtnCollectionService
             'amount'      => $amount,
         ]);
 
+        // ---- ADD THIS DEBUG BLOCK ----
+        Log::info('MTN Request Debug', [
+            'url'          => $this->tokenService->getBaseUrl() . '/collection/v1_0/requesttopay',
+            'environment'  => $this->tokenService->getTargetEnv(),
+            'sub_key_hint' => substr($subscriptionKey, 0, 8) . '...',
+            'token_hint'   => substr($token, 0, 10) . '...',
+            //'callback_url' => self::CALLBACK_URL,
+            'outbound_ip'  => @file_get_contents('https://api.ipify.org'),
+            'amount_sent' => (string) intval($amount),
+            'payload'        => json_encode($payload),   // ← add this
+            'token_length'   => strlen($token),  
+            'laravel_version' => app()->version(),
+            'guzzle_headers'  => 'check Accept header',
+        ]);
+        // ---- END DEBUG BLOCK ----
+
+        // $response = Http::withHeaders([
+        //     'Authorization'             => "Bearer {$token}",
+        //     'X-Reference-Id'            => $referenceId,
+        //     'X-Target-Environment'      => $this->tokenService->getTargetEnv(),
+        //     'Ocp-Apim-Subscription-Key' => $subscriptionKey,
+        //     'Content-Type'              => 'application/json',
+        //     // Header required by MTN API — callback is confirmed non-functional
+        //     'X-Callback-Url'            => self::CALLBACK_URL,
+        //     'Accept'                    => '*/*', 
+        // ])->post($this->tokenService->getBaseUrl() . '/collection/v1_0/requesttopay', $payload);
         $response = Http::withHeaders([
             'Authorization'             => "Bearer {$token}",
             'X-Reference-Id'            => $referenceId,
             'X-Target-Environment'      => $this->tokenService->getTargetEnv(),
             'Ocp-Apim-Subscription-Key' => $subscriptionKey,
             'Content-Type'              => 'application/json',
-            // Header required by MTN API — callback is confirmed non-functional
-            'X-Callback-Url'            => self::CALLBACK_URL,
-        ])->post($this->tokenService->getBaseUrl() . '/collection/v1_0/requesttopay', $payload);
+        ])->withOptions([
+            'curl' => [
+                CURLOPT_HTTPHEADER => [
+                    'Authorization: Bearer ' . $token,
+                    'X-Reference-Id: ' . $referenceId,
+                    'X-Target-Environment: ' . $this->tokenService->getTargetEnv(),
+                    'Ocp-Apim-Subscription-Key: ' . $subscriptionKey,
+                    'Content-Type: application/json',
+                    // Explicitly NO Accept header
+                ],
+            ],
+        ])->send('POST', $this->tokenService->getBaseUrl() . '/collection/v1_0/requesttopay', [
+            'body' => json_encode($payload),
+        ]);
 
         if ($response->status() === 202) {
             Log::info('MTN Collection: requestToPay accepted (202)', ['referenceId' => $referenceId]);

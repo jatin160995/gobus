@@ -5,17 +5,19 @@ namespace App\Services\Payment;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use App\Models\Setting;
 
 class MtnCollectionService
 {
+    // Hardcoded callback URL — MTN requires the header but never calls it (confirmed dead)
+    private const CALLBACK_URL = 'http://40.66.32.153/go-admin/api/mtn/webhook/collection';
+
     public function __construct(
         private MtnTokenService $tokenService
     ) {}
 
     /**
-     * Send a Request To Pay to the user's MTN MoMo number.
-     * Returns the X-Reference-Id UUID on success, null on failure.
+     * Send a Request To Pay (USSD prompt) to the user's MTN MoMo number.
+     * Returns the X-Reference-Id UUID on success (202), null on failure.
      */
     public function requestToPay(
         float  $amount,
@@ -25,19 +27,17 @@ class MtnCollectionService
         string $payeeNote    = 'GoBus'
     ): ?string {
         $token           = $this->tokenService->getCollectionToken();
-        $subscriptionKey = Setting::getValue('mtn_collection_subscription_key');
+        $subscriptionKey = $this->tokenService->getCollectionSubscriptionKey();
         $referenceId     = (string) Str::uuid();
 
-        if (!$token || !$subscriptionKey) {
-            Log::error('MTN Collection: Missing token or subscription key');
+        if (!$token) {
+            Log::error('MTN Collection: Failed to get token');
             return null;
         }
 
-        // MTN requires MSISDN in format 2376XXXXXXXX (no + sign)
-        $msisdn = $this->formatMsisdn($msisdn);
-
+        $msisdn  = $this->formatMsisdn($msisdn);
         $payload = [
-            'amount'       => (string) intval($amount), // MTN expects string, no decimals for XAF
+            'amount'       => (string) intval($amount), // XAF has no decimals
             'currency'     => 'XAF',
             'externalId'   => $externalId,
             'payer'        => [
@@ -58,26 +58,25 @@ class MtnCollectionService
         $response = Http::withHeaders([
             'Authorization'             => "Bearer {$token}",
             'X-Reference-Id'            => $referenceId,
-            'X-Target-Environment'      => 'mtncameroon',
+            'X-Target-Environment'      => $this->tokenService->getTargetEnv(),
             'Ocp-Apim-Subscription-Key' => $subscriptionKey,
             'Content-Type'              => 'application/json',
-            // Callback URL — MTN will POST result here
-            'X-Callback-Url'            => config('app.url') . '/api/mtn/webhook/collection',
-        ])->post('https://proxy.momoapi.mtn.com/collection/v1_0/requesttopay', $payload);
+            // Header required by MTN API — callback is confirmed non-functional
+            'X-Callback-Url'            => self::CALLBACK_URL,
+        ])->post($this->tokenService->getBaseUrl() . '/collection/v1_0/requesttopay', $payload);
 
-        // MTN returns 202 Accepted on success (not 200)
         if ($response->status() === 202) {
-            Log::info('MTN Collection: requestToPay accepted', ['referenceId' => $referenceId]);
+            Log::info('MTN Collection: requestToPay accepted (202)', ['referenceId' => $referenceId]);
             return $referenceId;
         }
 
-        // Token may be expired — clear cache and log
         if ($response->status() === 401) {
             $this->tokenService->clearCollectionToken();
+            Log::warning('MTN Collection: Token expired, cleared cache');
         }
 
-        Log::error('MTN Collection: requestToPay failed', [
-            'status'      => $response->status(),
+        Log::error('MTN Collection: requestToPay FAILED', [
+            'httpStatus'  => $response->status(),
             'body'        => $response->body(),
             'referenceId' => $referenceId,
         ]);
@@ -86,33 +85,31 @@ class MtnCollectionService
     }
 
     /**
-     * Check the status of a requesttopay transaction.
-     * Returns status string: PENDING | SUCCESSFUL | FAILED
+     * Poll status of a requesttopay transaction.
+     * Returns: 'PENDING' | 'SUCCESSFUL' | 'FAILED'
      */
     public function getTransactionStatus(string $referenceId): string
     {
         $token           = $this->tokenService->getCollectionToken();
-        $subscriptionKey = Setting::getValue('mtn_collection_subscription_key');
+        $subscriptionKey = $this->tokenService->getCollectionSubscriptionKey();
 
-        if (!$token || !$subscriptionKey) {
+        if (!$token) {
+            Log::error('MTN Collection: No token for status check', ['referenceId' => $referenceId]);
             return 'FAILED';
         }
 
         $response = Http::withHeaders([
             'Authorization'             => "Bearer {$token}",
-            'X-Target-Environment'      => 'mtncameroon',
+            'X-Target-Environment'      => $this->tokenService->getTargetEnv(),
             'Ocp-Apim-Subscription-Key' => $subscriptionKey,
-        ])->get("https://proxy.momoapi.mtn.com/collection/v1_0/requesttopay/{$referenceId}");
+        ])->get($this->tokenService->getBaseUrl() . "/collection/v1_0/requesttopay/{$referenceId}");
 
         if ($response->successful()) {
-            $data   = $response->json();
-            $status = strtoupper($data['status'] ?? 'PENDING');
-
-            Log::info('MTN Collection: status check', [
+            $status = strtoupper($response->json('status', 'PENDING'));
+            Log::info('MTN Collection: Status polled', [
                 'referenceId' => $referenceId,
                 'status'      => $status,
             ]);
-
             return $status; // PENDING | SUCCESSFUL | FAILED
         }
 
@@ -120,9 +117,9 @@ class MtnCollectionService
             $this->tokenService->clearCollectionToken();
         }
 
-        Log::error('MTN Collection: status check failed', [
+        Log::error('MTN Collection: Status poll FAILED', [
             'referenceId' => $referenceId,
-            'status'      => $response->status(),
+            'httpStatus'  => $response->status(),
             'body'        => $response->body(),
         ]);
 
@@ -130,19 +127,16 @@ class MtnCollectionService
     }
 
     /**
-     * Format MSISDN to MTN format: 2376XXXXXXXX
+     * Normalize MSISDN to MTN Cameroon format: 237XXXXXXXXX
      */
     private function formatMsisdn(string $msisdn): string
     {
-        // Remove all non-digits
         $msisdn = preg_replace('/\D/', '', $msisdn);
 
-        // If starts with 0, replace with 237
         if (str_starts_with($msisdn, '0')) {
             $msisdn = '237' . substr($msisdn, 1);
         }
 
-        // If 9 digits (local format like 676XXXXXX), prepend 237
         if (strlen($msisdn) === 9) {
             $msisdn = '237' . $msisdn;
         }

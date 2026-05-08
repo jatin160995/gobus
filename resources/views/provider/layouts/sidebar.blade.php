@@ -1,7 +1,6 @@
 @php
     $provider = auth()->user()?->currentProvider();
     $providerType = $provider->type ?? null;
- 
 @endphp
 <ul class="navbar-nav bg-primary-app sidebar sidebar-dark accordion" id="accordionSidebar">
 

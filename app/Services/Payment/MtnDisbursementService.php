@@ -5,17 +5,20 @@ namespace App\Services\Payment;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use App\Models\Setting;
 
 class MtnDisbursementService
 {
+    // Hardcoded callback URL — MTN requires the header but never calls it (confirmed dead)
+    private const CALLBACK_URL = 'http://40.66.32.153/go-admin/api/mtn/webhook/disbursement';
+
     public function __construct(
         private MtnTokenService $tokenService
     ) {}
 
     /**
-     * Transfer money to a recipient MSISDN.
-     * Returns the X-Reference-Id on success, null on failure.
+     * Transfer money to a recipient's MTN MoMo number.
+     * Body uses "payee" (not "payer") — disbursement-specific.
+     * Returns the X-Reference-Id on success (202), null on failure.
      */
     public function transfer(
         float  $amount,
@@ -25,21 +28,20 @@ class MtnDisbursementService
         string $payeeNote    = 'GoBus'
     ): ?string {
         $token           = $this->tokenService->getDisbursementToken();
-        $subscriptionKey = Setting::getValue('mtn_disbursement_subscription_key');
+        $subscriptionKey = $this->tokenService->getDisbursementSubscriptionKey();
         $referenceId     = (string) Str::uuid();
 
-        if (!$token || !$subscriptionKey) {
-            Log::error('MTN Disbursement: Missing token or subscription key');
+        if (!$token) {
+            Log::error('MTN Disbursement: Failed to get token');
             return null;
         }
 
-        $msisdn = $this->formatMsisdn($msisdn);
-
+        $msisdn  = $this->formatMsisdn($msisdn);
         $payload = [
-            'amount'       => (string) intval($amount),
+            'amount'       => (string) intval($amount), // XAF no decimals
             'currency'     => 'XAF',
             'externalId'   => $externalId,
-            'payee'        => [                      // NOTE: disbursement uses "payee" not "payer"
+            'payee'        => [  // NOTE: disbursement uses "payee", collection uses "payer"
                 'partyIdType' => 'MSISDN',
                 'partyId'     => $msisdn,
             ],
@@ -57,23 +59,25 @@ class MtnDisbursementService
         $response = Http::withHeaders([
             'Authorization'             => "Bearer {$token}",
             'X-Reference-Id'            => $referenceId,
-            'X-Target-Environment'      => 'mtncameroon',
+            'X-Target-Environment'      => $this->tokenService->getTargetEnv(),
             'Ocp-Apim-Subscription-Key' => $subscriptionKey,
             'Content-Type'              => 'application/json',
-            'X-Callback-Url'            => config('app.url') . '/api/mtn/webhook/disbursement',
-        ])->post('https://proxy.momoapi.mtn.com/disbursement/v1_0/transfer', $payload);
+            // Header required by MTN API — callback confirmed non-functional
+            'X-Callback-Url'            => self::CALLBACK_URL,
+        ])->post($this->tokenService->getBaseUrl() . '/disbursement/v1_0/transfer', $payload);
 
         if ($response->status() === 202) {
-            Log::info('MTN Disbursement: Transfer accepted', ['referenceId' => $referenceId]);
+            Log::info('MTN Disbursement: Transfer accepted (202)', ['referenceId' => $referenceId]);
             return $referenceId;
         }
 
         if ($response->status() === 401) {
             $this->tokenService->clearDisbursementToken();
+            Log::warning('MTN Disbursement: Token expired, cleared cache');
         }
 
-        Log::error('MTN Disbursement: Transfer failed', [
-            'status'      => $response->status(),
+        Log::error('MTN Disbursement: Transfer FAILED', [
+            'httpStatus'  => $response->status(),
             'body'        => $response->body(),
             'referenceId' => $referenceId,
         ]);
@@ -82,28 +86,42 @@ class MtnDisbursementService
     }
 
     /**
-     * Check status of a disbursement transfer.
+     * Poll status of a disbursement transfer.
+     * Returns: 'PENDING' | 'SUCCESSFUL' | 'FAILED'
      */
     public function getTransferStatus(string $referenceId): string
     {
         $token           = $this->tokenService->getDisbursementToken();
-        $subscriptionKey = Setting::getValue('mtn_disbursement_subscription_key');
+        $subscriptionKey = $this->tokenService->getDisbursementSubscriptionKey();
 
-        if (!$token || !$subscriptionKey) return 'FAILED';
+        if (!$token) {
+            return 'FAILED';
+        }
 
         $response = Http::withHeaders([
             'Authorization'             => "Bearer {$token}",
-            'X-Target-Environment'      => 'mtncameroon',
+            'X-Target-Environment'      => $this->tokenService->getTargetEnv(),
             'Ocp-Apim-Subscription-Key' => $subscriptionKey,
-        ])->get("https://proxy.momoapi.mtn.com/disbursement/v1_0/transfer/{$referenceId}");
+        ])->get($this->tokenService->getBaseUrl() . "/disbursement/v1_0/transfer/{$referenceId}");
 
         if ($response->successful()) {
-            return strtoupper($response->json()['status'] ?? 'PENDING');
+            $status = strtoupper($response->json('status', 'PENDING'));
+            Log::info('MTN Disbursement: Status polled', [
+                'referenceId' => $referenceId,
+                'status'      => $status,
+            ]);
+            return $status;
         }
 
         if ($response->status() === 401) {
             $this->tokenService->clearDisbursementToken();
         }
+
+        Log::error('MTN Disbursement: Status poll FAILED', [
+            'referenceId' => $referenceId,
+            'httpStatus'  => $response->status(),
+            'body'        => $response->body(),
+        ]);
 
         return 'FAILED';
     }

@@ -89,8 +89,18 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/orange/webhook',          [OrangeWebhookController::class, 'handle']);
 Route::post('mtn/webhook/collection',   [MtnCallbackController::class, 'collection']);
 Route::post('mtn/webhook/disbursement', [MtnCallbackController::class, 'disbursement']);
-Route::post('mtn/webhook/debug',        [MtnCallbackController::class, 'debug']);
 
 Route::get('/test-api', function () {
     return response()->json(['status' => true]);
+});
+
+// TEMPORARY — remove after testing
+Route::get('/debug/mtn-token', function () {
+    $tokenService = app(\App\Services\Payment\MtnTokenService::class);
+    return response()->json([
+        'collection_token'    => $tokenService->getCollectionToken() ? 'OK ✅' : 'FAILED ❌',
+        'disbursement_token'  => $tokenService->getDisbursementToken() ? 'OK ✅' : 'FAILED ❌',
+        'collection_sub_key'  => $tokenService->getCollectionSubscriptionKey() ? 'SET ✅' : 'MISSING ❌',
+        'disbursement_sub_key'=> $tokenService->getDisbursementSubscriptionKey() ? 'SET ✅' : 'MISSING ❌',
+    ]);
 });

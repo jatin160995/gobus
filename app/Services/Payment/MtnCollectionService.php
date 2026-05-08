@@ -2,15 +2,11 @@
 
 namespace App\Services\Payment;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class MtnCollectionService
 {
-    // Hardcoded callback URL — MTN requires the header but never calls it (confirmed dead)
-    private const CALLBACK_URL = 'http://40.66.32.153/go-admin/api/mtn/webhook/collection';
-
     public function __construct(
         private MtnTokenService $tokenService
     ) {}
@@ -18,6 +14,9 @@ class MtnCollectionService
     /**
      * Send a Request To Pay (USSD prompt) to the user's MTN MoMo number.
      * Returns the X-Reference-Id UUID on success (202), null on failure.
+     *
+     * Uses raw PHP cURL instead of Guzzle/Laravel Http to have 100% control
+     * over headers and avoid WAF rejection from auto-added headers.
      */
     public function requestToPay(
         float  $amount,
@@ -36,8 +35,8 @@ class MtnCollectionService
         }
 
         $msisdn  = $this->formatMsisdn($msisdn);
-        $payload = [
-            'amount'       => (string) intval($amount), // XAF has no decimals
+        $payload = json_encode([
+            'amount'       => (string) intval($amount),
             'currency'     => 'XAF',
             'externalId'   => $externalId,
             'payer'        => [
@@ -46,7 +45,9 @@ class MtnCollectionService
             ],
             'payerMessage' => $payerMessage,
             'payeeNote'    => $payeeNote,
-        ];
+        ]);
+
+        $url = $this->tokenService->getBaseUrl() . '/collection/v1_0/requesttopay';
 
         Log::info('MTN Collection: requestToPay initiating', [
             'referenceId' => $referenceId,
@@ -55,66 +56,52 @@ class MtnCollectionService
             'amount'      => $amount,
         ]);
 
-        // ---- ADD THIS DEBUG BLOCK ----
-        Log::info('MTN Request Debug', [
-            'url'          => $this->tokenService->getBaseUrl() . '/collection/v1_0/requesttopay',
-            'environment'  => $this->tokenService->getTargetEnv(),
-            'sub_key_hint' => substr($subscriptionKey, 0, 8) . '...',
-            'token_hint'   => substr($token, 0, 10) . '...',
-            //'callback_url' => self::CALLBACK_URL,
-            'outbound_ip'  => @file_get_contents('https://api.ipify.org'),
-            'amount_sent' => (string) intval($amount),
-            'payload'        => json_encode($payload),   // ← add this
-            'token_length'   => strlen($token),  
-            'laravel_version' => app()->version(),
-            'guzzle_headers'  => 'check Accept header',
-        ]);
-        // ---- END DEBUG BLOCK ----
+        // ── Raw PHP cURL — exact same pattern that worked in debug test3 ──
+        $ch = curl_init($url);
 
-        // $response = Http::withHeaders([
-        //     'Authorization'             => "Bearer {$token}",
-        //     'X-Reference-Id'            => $referenceId,
-        //     'X-Target-Environment'      => $this->tokenService->getTargetEnv(),
-        //     'Ocp-Apim-Subscription-Key' => $subscriptionKey,
-        //     'Content-Type'              => 'application/json',
-        //     // Header required by MTN API — callback is confirmed non-functional
-        //     'X-Callback-Url'            => self::CALLBACK_URL,
-        //     'Accept'                    => '*/*', 
-        // ])->post($this->tokenService->getBaseUrl() . '/collection/v1_0/requesttopay', $payload);
-        $response = Http::withHeaders([
-            'Authorization'             => "Bearer {$token}",
-            'X-Reference-Id'            => $referenceId,
-            'X-Target-Environment'      => $this->tokenService->getTargetEnv(),
-            'Ocp-Apim-Subscription-Key' => $subscriptionKey,
-            'Content-Type'              => 'application/json',
-        ])->withOptions([
-            'curl' => [
-                CURLOPT_HTTPHEADER => [
-                    'Authorization: Bearer ' . $token,
-                    'X-Reference-Id: ' . $referenceId,
-                    'X-Target-Environment: ' . $this->tokenService->getTargetEnv(),
-                    'Ocp-Apim-Subscription-Key: ' . $subscriptionKey,
-                    'Content-Type: application/json',
-                    // Explicitly NO Accept header
-                ],
-            ],
-        ])->send('POST', $this->tokenService->getBaseUrl() . '/collection/v1_0/requesttopay', [
-            'body' => json_encode($payload),
+        $headers = [
+            'Authorization: Bearer ' . $token,
+            'X-Reference-Id: ' . $referenceId,
+            'X-Target-Environment: ' . $this->tokenService->getTargetEnv(),
+            'Ocp-Apim-Subscription-Key: ' . $subscriptionKey,
+            'Content-Type: application/json',
+        ];
+
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_HTTPHEADER     => $headers,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_SSL_VERIFYPEER => true,
         ]);
 
-        if ($response->status() === 202) {
+        $responseBody = curl_exec($ch);
+        $httpCode     = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError    = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError) {
+            Log::error('MTN Collection: cURL error', [
+                'error'       => $curlError,
+                'referenceId' => $referenceId,
+            ]);
+            return null;
+        }
+
+        if ($httpCode === 202) {
             Log::info('MTN Collection: requestToPay accepted (202)', ['referenceId' => $referenceId]);
             return $referenceId;
         }
 
-        if ($response->status() === 401) {
+        if ($httpCode === 401) {
             $this->tokenService->clearCollectionToken();
             Log::warning('MTN Collection: Token expired, cleared cache');
         }
 
         Log::error('MTN Collection: requestToPay FAILED', [
-            'httpStatus'  => $response->status(),
-            'body'        => $response->body(),
+            'httpStatus'  => $httpCode,
+            'body'        => substr($responseBody, 0, 500),
             'referenceId' => $referenceId,
         ]);
 
@@ -135,29 +122,54 @@ class MtnCollectionService
             return 'FAILED';
         }
 
-        $response = Http::withHeaders([
-            'Authorization'             => "Bearer {$token}",
-            'X-Target-Environment'      => $this->tokenService->getTargetEnv(),
-            'Ocp-Apim-Subscription-Key' => $subscriptionKey,
-        ])->get($this->tokenService->getBaseUrl() . "/collection/v1_0/requesttopay/{$referenceId}");
+        $url = $this->tokenService->getBaseUrl() . "/collection/v1_0/requesttopay/{$referenceId}";
 
-        if ($response->successful()) {
-            $status = strtoupper($response->json('status', 'PENDING'));
+        $ch = curl_init($url);
+
+        $headers = [
+            'Authorization: Bearer ' . $token,
+            'X-Target-Environment: ' . $this->tokenService->getTargetEnv(),
+            'Ocp-Apim-Subscription-Key: ' . $subscriptionKey,
+        ];
+
+        curl_setopt_array($ch, [
+            CURLOPT_HTTPHEADER     => $headers,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_SSL_VERIFYPEER => true,
+        ]);
+
+        $responseBody = curl_exec($ch);
+        $httpCode     = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError    = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError) {
+            Log::error('MTN Collection: Status check cURL error', [
+                'error'       => $curlError,
+                'referenceId' => $referenceId,
+            ]);
+            return 'FAILED';
+        }
+
+        if ($httpCode >= 200 && $httpCode < 300) {
+            $data   = json_decode($responseBody, true);
+            $status = strtoupper($data['status'] ?? 'PENDING');
             Log::info('MTN Collection: Status polled', [
                 'referenceId' => $referenceId,
                 'status'      => $status,
             ]);
-            return $status; // PENDING | SUCCESSFUL | FAILED
+            return $status;
         }
 
-        if ($response->status() === 401) {
+        if ($httpCode === 401) {
             $this->tokenService->clearCollectionToken();
         }
 
         Log::error('MTN Collection: Status poll FAILED', [
             'referenceId' => $referenceId,
-            'httpStatus'  => $response->status(),
-            'body'        => $response->body(),
+            'httpStatus'  => $httpCode,
+            'body'        => substr($responseBody, 0, 500),
         ]);
 
         return 'FAILED';

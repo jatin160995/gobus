@@ -2,15 +2,11 @@
 
 namespace App\Services\Payment;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class MtnDisbursementService
 {
-    // Hardcoded callback URL — MTN requires the header but never calls it (confirmed dead)
-    private const CALLBACK_URL = 'http://40.66.32.153/go-admin/api/mtn/webhook/disbursement';
-
     public function __construct(
         private MtnTokenService $tokenService
     ) {}
@@ -19,6 +15,9 @@ class MtnDisbursementService
      * Transfer money to a recipient's MTN MoMo number.
      * Body uses "payee" (not "payer") — disbursement-specific.
      * Returns the X-Reference-Id on success (202), null on failure.
+     *
+     * Uses raw PHP cURL instead of Guzzle/Laravel Http to have 100% control
+     * over headers and avoid WAF rejection from auto-added headers.
      */
     public function transfer(
         float  $amount,
@@ -37,17 +36,19 @@ class MtnDisbursementService
         }
 
         $msisdn  = $this->formatMsisdn($msisdn);
-        $payload = [
-            'amount'       => (string) intval($amount), // XAF no decimals
+        $payload = json_encode([
+            'amount'       => (string) intval($amount),
             'currency'     => 'XAF',
             'externalId'   => $externalId,
-            'payee'        => [  // NOTE: disbursement uses "payee", collection uses "payer"
+            'payee'        => [
                 'partyIdType' => 'MSISDN',
                 'partyId'     => $msisdn,
             ],
             'payerMessage' => $payerMessage,
             'payeeNote'    => $payeeNote,
-        ];
+        ]);
+
+        $url = $this->tokenService->getBaseUrl() . '/disbursement/v1_0/transfer';
 
         Log::info('MTN Disbursement: Transfer initiating', [
             'referenceId' => $referenceId,
@@ -56,29 +57,52 @@ class MtnDisbursementService
             'amount'      => $amount,
         ]);
 
-        $response = Http::withHeaders([
-            'Authorization'             => "Bearer {$token}",
-            'X-Reference-Id'            => $referenceId,
-            'X-Target-Environment'      => $this->tokenService->getTargetEnv(),
-            'Ocp-Apim-Subscription-Key' => $subscriptionKey,
-            'Content-Type'              => 'application/json',
-            // Header required by MTN API — callback confirmed non-functional
-            'X-Callback-Url'            => self::CALLBACK_URL,
-        ])->post($this->tokenService->getBaseUrl() . '/disbursement/v1_0/transfer', $payload);
+        // ── Raw PHP cURL — same proven pattern as MtnCollectionService ──
+        $ch = curl_init($url);
 
-        if ($response->status() === 202) {
+        $headers = [
+            'Authorization: Bearer ' . $token,
+            'X-Reference-Id: ' . $referenceId,
+            'X-Target-Environment: ' . $this->tokenService->getTargetEnv(),
+            'Ocp-Apim-Subscription-Key: ' . $subscriptionKey,
+            'Content-Type: application/json',
+        ];
+
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_HTTPHEADER     => $headers,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_SSL_VERIFYPEER => true,
+        ]);
+
+        $responseBody = curl_exec($ch);
+        $httpCode     = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError    = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError) {
+            Log::error('MTN Disbursement: cURL error', [
+                'error'       => $curlError,
+                'referenceId' => $referenceId,
+            ]);
+            return null;
+        }
+
+        if ($httpCode === 202) {
             Log::info('MTN Disbursement: Transfer accepted (202)', ['referenceId' => $referenceId]);
             return $referenceId;
         }
 
-        if ($response->status() === 401) {
+        if ($httpCode === 401) {
             $this->tokenService->clearDisbursementToken();
             Log::warning('MTN Disbursement: Token expired, cleared cache');
         }
 
         Log::error('MTN Disbursement: Transfer FAILED', [
-            'httpStatus'  => $response->status(),
-            'body'        => $response->body(),
+            'httpStatus'  => $httpCode,
+            'body'        => substr($responseBody, 0, 500),
             'referenceId' => $referenceId,
         ]);
 
@@ -98,14 +122,39 @@ class MtnDisbursementService
             return 'FAILED';
         }
 
-        $response = Http::withHeaders([
-            'Authorization'             => "Bearer {$token}",
-            'X-Target-Environment'      => $this->tokenService->getTargetEnv(),
-            'Ocp-Apim-Subscription-Key' => $subscriptionKey,
-        ])->get($this->tokenService->getBaseUrl() . "/disbursement/v1_0/transfer/{$referenceId}");
+        $url = $this->tokenService->getBaseUrl() . "/disbursement/v1_0/transfer/{$referenceId}";
 
-        if ($response->successful()) {
-            $status = strtoupper($response->json('status', 'PENDING'));
+        $ch = curl_init($url);
+
+        $headers = [
+            'Authorization: Bearer ' . $token,
+            'X-Target-Environment: ' . $this->tokenService->getTargetEnv(),
+            'Ocp-Apim-Subscription-Key: ' . $subscriptionKey,
+        ];
+
+        curl_setopt_array($ch, [
+            CURLOPT_HTTPHEADER     => $headers,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_SSL_VERIFYPEER => true,
+        ]);
+
+        $responseBody = curl_exec($ch);
+        $httpCode     = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError    = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError) {
+            Log::error('MTN Disbursement: Status check cURL error', [
+                'error'       => $curlError,
+                'referenceId' => $referenceId,
+            ]);
+            return 'FAILED';
+        }
+
+        if ($httpCode >= 200 && $httpCode < 300) {
+            $data   = json_decode($responseBody, true);
+            $status = strtoupper($data['status'] ?? 'PENDING');
             Log::info('MTN Disbursement: Status polled', [
                 'referenceId' => $referenceId,
                 'status'      => $status,
@@ -113,14 +162,14 @@ class MtnDisbursementService
             return $status;
         }
 
-        if ($response->status() === 401) {
+        if ($httpCode === 401) {
             $this->tokenService->clearDisbursementToken();
         }
 
         Log::error('MTN Disbursement: Status poll FAILED', [
             'referenceId' => $referenceId,
-            'httpStatus'  => $response->status(),
-            'body'        => $response->body(),
+            'httpStatus'  => $httpCode,
+            'body'        => substr($responseBody, 0, 500),
         ]);
 
         return 'FAILED';

@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\V1\OrangeWebhookController;
 use App\Http\Controllers\Api\V1\PassengerController;
 use App\Http\Controllers\Api\V1\MtnCallbackController;
 use App\Http\Controllers\Api\V1\MtnPaymentController;
+use App\Http\Controllers\Api\V1\MtnDebugController;
+use App\Http\Controllers\Api\V1\MtnHardcodedDebugController;
 
 Route::get('/', function () {
     return response()->json(['message' => 'GO API is running']);
@@ -95,6 +97,8 @@ Route::get('/test-api', function () {
 });
 
 // TEMPORARY — remove after testing
+Route::get('/debug/mtn-headers', [MtnDebugController::class, 'compareHeaders']);
+Route::get('/debug/mtn-hardcoded', [MtnHardcodedDebugController::class, 'test']);
 Route::get('/debug/mtn-token', function () {
     $tokenService = app(\App\Services\Payment\MtnTokenService::class);
     return response()->json([

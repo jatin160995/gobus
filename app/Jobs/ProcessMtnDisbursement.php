@@ -121,7 +121,7 @@ class ProcessMtnDisbursement implements ShouldQueue
     {
         return DB::table('providers')
             ->where('id', $providerId)
-            ->where('is_active', 1)
+            ->where('status', 'active')
             ->value('mtn_msisdn');
     }
     private function getInsuranceMsisdn(): ?string

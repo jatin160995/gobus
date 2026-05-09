@@ -43,8 +43,8 @@ class MtnCollectionService
                 'partyIdType' => 'MSISDN',
                 'partyId'     => $msisdn,
             ],
-            'payerMessage' => $payerMessage,
-            'payeeNote'    => $payeeNote,
+            'payerMessage' => "GoBus Booking Payment",
+            'payeeNote'    => 'GoBus',
         ]);
 
         $url = $this->tokenService->getBaseUrl() . '/collection/v1_0/requesttopay';
@@ -65,6 +65,7 @@ class MtnCollectionService
             'X-Target-Environment: ' . $this->tokenService->getTargetEnv(),
             'Ocp-Apim-Subscription-Key: ' . $subscriptionKey,
             'Content-Type: application/json',
+            'X-Callback-Url: http://40.66.32.153/go-admin/api/mtn/webhook/collection',
         ];
 
         curl_setopt_array($ch, [
@@ -79,6 +80,18 @@ class MtnCollectionService
         $responseBody = curl_exec($ch);
         $httpCode     = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $curlError    = curl_error($ch);
+
+        // ─── ADD THIS BLOCK ───────────────────────────────────────────
+Log::info('MTN Collection: Full requestToPay debug', [
+    'referenceId'     => $referenceId,
+    'httpCode'        => $httpCode,
+    'requestUrl'      => $url,
+    'requestPayload'  => json_decode($payload, true),
+    'requestHeaders'  => $headers,
+    'responseBody'    => $responseBody,
+    'curlError'       => $curlError ?: null,
+]);
+// ─────────────────────────────────────────────────────────────
         curl_close($ch);
 
         if ($curlError) {

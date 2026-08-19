@@ -64,13 +64,13 @@ class ProcessMtnDisbursement implements ShouldQueue
         [$payerMessage, $payeeNote] = match ($transaction->transaction_type) {
             'insurance_payout' => [
                 'GoBus Insurance Payout',
-                'Insurance for Booking #' . $transaction->booking_id,
+                'Insurance Booking',
             ],
             'provider_payout' => [
                 'GoBus Agency Payout',
-                'Agency payout for Booking #' . $transaction->booking_id,
+                'Agency payout for Booking #',
             ],
-            default => ['GoBus Payout', 'Booking #' . $transaction->booking_id],
+            default => ['GoBus Payout', 'Booking' ],
         };
 
         // Initiate the MTN transfer

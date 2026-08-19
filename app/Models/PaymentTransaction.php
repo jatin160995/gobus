@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Models;
 
@@ -16,10 +16,22 @@ class PaymentTransaction extends Model
         'amount',
         'currency',
         'transaction_status',
-        'booking_type'
+        'booking_type',
+        'payment_method',
+        'processed_at',
     ];
 
     protected $casts = [
         'processed_at' => 'datetime',
     ];
+
+    public function payoutAttempts()
+    {
+        return $this->hasMany(PayoutAttempt::class, 'payment_transaction_id');
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(PaymentOrder::class, 'payment_order_id');
+    }
 }

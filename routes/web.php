@@ -58,7 +58,7 @@ Route::post('/create-user-go', [AuthController::class, 'register'])->name('regis
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 });
-Route::middleware(['admin'])->group(function() {
+    Route::middleware(['admin'])->group(function() {
    
     //----------------
     //USERS
@@ -162,6 +162,35 @@ Route::middleware(['admin'])->group(function() {
 
     // });
     Route::resource('settings', SettingController::class);
+
+        // ── Payments Module ──────────────────────────────────────────────────────
+    Route::get('/admin/payments/collections',
+        [\App\Http\Controllers\Admin\PaymentAdminController::class, 'collections'])
+        ->name('admin.payments.collections');
+
+    Route::get('/admin/payments/disbursements',
+        [\App\Http\Controllers\Admin\PaymentAdminController::class, 'disbursements'])
+        ->name('admin.payments.disbursements');
+
+    Route::get('/admin/payments/{id}',
+        [\App\Http\Controllers\Admin\PaymentAdminController::class, 'show'])
+        ->name('admin.payments.show');
+
+    Route::post('/admin/payments/disbursement/{transactionId}/retry',
+        [\App\Http\Controllers\Admin\PaymentAdminController::class, 'retryDisbursement'])
+        ->name('admin.payments.retry-disbursement');
+
+    Route::post('/admin/payments/order/{orderId}/retry-all',
+        [\App\Http\Controllers\Admin\PaymentAdminController::class, 'retryAllDisbursements'])
+        ->name('admin.payments.retry-all-disbursements'); 
+
+            Route::get('/admin/payments/order/{orderId}/retry-collection',
+        [\App\Http\Controllers\Admin\PaymentAdminController::class, 'retryCollectionForm'])
+        ->name('admin.payments.retry-collection-form');
+
+    Route::post('/admin/payments/order/{orderId}/retry-collection',
+        [\App\Http\Controllers\Admin\PaymentAdminController::class, 'retryCollection'])
+        ->name('admin.payments.retry-collection');
 });
 // Provider Routes ------------------------------------------------------------------------------------------------------------------------------------------
 Route::middleware(['auth', 'role:provider'])

@@ -65,7 +65,7 @@ class MtnDisbursementService
             'X-Reference-Id: ' . $referenceId,
             'X-Target-Environment: ' . $this->tokenService->getTargetEnv(),
             'Ocp-Apim-Subscription-Key: ' . $subscriptionKey,
-            'X-Callback-Url: http://40.66.32.153/go-admin/api/mtn/webhook/disbursement',
+            //'X-Callback-Url: http://40.66.32.153/go-admin/api/mtn/webhook/disbursement',
             'Content-Type: application/json',
         ];
 

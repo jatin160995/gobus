@@ -87,8 +87,8 @@
       </a>
       <div id="collapsePayments" class="collapse" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-              <a class="collapse-item" href="#">{{ __('sidebar.transactions') }}</a>
-              <a class="collapse-item" href="#">{{ __('sidebar.refunds') }}</a>
+            <a class="collapse-item" href="{{ route('admin.payments.collections') }}">💳 Collections</a>
+            <a class="collapse-item" href="{{ route('admin.payments.disbursements') }}">📤 Disbursements</a>
           </div>
       </div>
   </li>

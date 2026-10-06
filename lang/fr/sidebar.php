@@ -33,4 +33,18 @@
 
     'settings' => 'Paramètres',
     'language' => 'Langue',
+
+    // GO Admin theme
+    'overview' => 'Vue d\'ensemble',
+    'operations' => 'Opérations',
+    'finance' => 'Finance',
+    'system' => 'Système',
+    'customers' => 'Clients',
+    'collections' => 'Encaissements',
+    'payouts' => 'Reversements',
+    'failed_payouts' => 'Reversements échoués en attente de relance',
+    'admin_panel' => 'GO Admin',
+    'open_menu' => 'Ouvrir le menu',
+    'logout' => 'Se déconnecter',
+    'logout_confirm' => 'Se déconnecter de GO Admin ?',
 ];

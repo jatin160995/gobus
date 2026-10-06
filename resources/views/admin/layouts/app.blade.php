@@ -1,6 +1,6 @@
 @include('admin.layouts.header')
 
-<div class="container-fluid">
+<main class="go-main">
   @yield('content')
-</div>
+</main>
 @include('admin.layouts.footer')

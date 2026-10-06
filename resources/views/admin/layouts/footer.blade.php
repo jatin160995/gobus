@@ -1,20 +1,11 @@
-        </div> <!-- End of Content -->
+    </div> <!-- End of Content -->
 
-        <!-- Footer -->
-        <footer class="sticky-footer bg-white">
-            <div class="container my-auto">
-                <div class="copyright text-center my-auto">
-                    <span>Copyright &copy;  ALO Technologies 2025</span>{{-- {{ date('Y') }} --}}
-                </div>
-            </div>
-        </footer>
-        <!-- End of Footer -->
-    </div> <!-- End of Content Wrapper -->
+    <footer class="go-footer">
+      <span>&copy; {{ date('Y') }} ALO Technologies · GO</span>
+      <span>TaxiGo · Douala &amp; Yaoundé Nsimalen</span>
+    </footer>
+  </div> <!-- End of Content Wrapper -->
 </div> <!-- End of Page Wrapper -->
-
-<a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-</a>
 
 <!-- Bootstrap core JavaScript-->
 <script src="{{ asset('admin/vendor/jquery/jquery.min.js') }}"></script>
@@ -22,7 +13,15 @@
 <script src="{{ asset('admin/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 <script src="{{ asset('admin/js/sb-admin-2.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script>
+  // Mobile menu
+  document.querySelectorAll('[data-go-nav-toggle]').forEach(function (btn) {
+    btn.addEventListener('click', function () { document.body.classList.toggle('go-nav-open'); });
+  });
+  document.querySelectorAll('[data-go-nav-close]').forEach(function (el) {
+    el.addEventListener('click', function () { document.body.classList.remove('go-nav-open'); });
+  });
+</script>
 
 @stack('scripts')
 </body>

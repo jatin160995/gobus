@@ -34,4 +34,18 @@ return [
 
     'settings' => 'Settings',
     'language' => 'Language',
+
+    // GO Admin theme
+    'overview' => 'Overview',
+    'operations' => 'Operations',
+    'finance' => 'Finance',
+    'system' => 'System',
+    'customers' => 'Customers',
+    'collections' => 'Collections',
+    'payouts' => 'Payouts',
+    'failed_payouts' => 'Failed payouts waiting for a retry',
+    'admin_panel' => 'GO Admin',
+    'open_menu' => 'Open menu',
+    'logout' => 'Log out',
+    'logout_confirm' => 'Log out of GO Admin?',
 ];

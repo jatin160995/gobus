@@ -22,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Local database backups (contain user data and payment keys)
+/storage/backups

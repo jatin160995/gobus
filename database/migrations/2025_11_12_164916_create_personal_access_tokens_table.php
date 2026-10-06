@@ -11,6 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // The table already exists in databases imported from the GO dump,
+        // where it was recorded under an older migration name.
+        if (Schema::hasTable('personal_access_tokens')) {
+            return;
+        }
+
         Schema::create('personal_access_tokens', function (Blueprint $table) {
             $table->id();
             $table->morphs('tokenable');

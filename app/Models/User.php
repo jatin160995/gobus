@@ -26,6 +26,8 @@ class User extends Authenticatable
     'phone',
     'password',
     'role',
+    'taxigo_hub_id',
+    'referral_partner_id',
 ];
 
     /**

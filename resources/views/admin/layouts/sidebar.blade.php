@@ -29,6 +29,7 @@
       </div>
   </li>
 
+  @if (\App\Support\Modules::anyLegacy())
   <!-- Providers -->
   <li class="nav-item">
       <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAgencies">
@@ -54,6 +55,9 @@
           </div>
       </div>
   </li>
+  @endif
+
+  @if (\App\Support\Modules::gobus())
   <!-- Trips -->
   <li class="nav-item">
       <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTrips">
@@ -79,6 +83,7 @@
           </div>
       </div>
   </li>
+  @endif
 
   <!-- Payments -->
   <li class="nav-item">

@@ -3,6 +3,7 @@
 
   // Payouts that need a retry, shown as a count next to the menu item
   $failedPayouts = \App\Models\PaymentTransaction::where('transaction_status', 'failed')->count();
+  $activeRides = \App\Models\TaxiGo\Ride::whereIn('status', \App\Models\TaxiGo\Ride::ACTIVE_STATUSES)->count();
 @endphp
 
 <aside class="go-sidebar" id="accordionSidebar">
@@ -18,6 +19,24 @@
     <div class="go-nav-label">{{ __('sidebar.overview') }}</div>
     <a class="go-nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
       <i class="fas fa-th-large"></i><span>{{ __('sidebar.dashboard') }}</span>
+    </a>
+
+    <div class="go-nav-label">{{ __('taxigo.menu') }}</div>
+    <a class="go-nav-link {{ request()->routeIs('admin.taxigo.rides.*') ? 'active' : '' }}" href="{{ route('admin.taxigo.rides.index') }}">
+      <i class="fas fa-taxi"></i><span>{{ __('taxigo.rides') }}</span>
+      @if ($activeRides > 0)<span class="go-nav-tag">{{ $activeRides }}</span>@endif
+    </a>
+    <a class="go-nav-link {{ request()->routeIs('admin.taxigo.drivers.*') ? 'active' : '' }}" href="{{ route('admin.taxigo.drivers.index') }}">
+      <i class="fas fa-id-badge"></i><span>{{ __('taxigo.drivers') }}</span>
+    </a>
+    <a class="go-nav-link {{ request()->routeIs('admin.taxigo.vehicles.*') ? 'active' : '' }}" href="{{ route('admin.taxigo.vehicles.index') }}">
+      <i class="fas fa-car-side"></i><span>{{ __('taxigo.vehicles') }}</span>
+    </a>
+    <a class="go-nav-link {{ request()->routeIs('admin.taxigo.tariffs.*') ? 'active' : '' }}" href="{{ route('admin.taxigo.tariffs.index') }}">
+      <i class="fas fa-tags"></i><span>{{ __('taxigo.tariffs') }}</span>
+    </a>
+    <a class="go-nav-link {{ request()->routeIs('admin.taxigo.split.*') ? 'active' : '' }}" href="{{ route('admin.taxigo.split.index') }}">
+      <i class="fas fa-chart-pie"></i><span>{{ __('taxigo.split') }}</span>
     </a>
 
     <div class="go-nav-label">{{ __('sidebar.operations') }}</div>

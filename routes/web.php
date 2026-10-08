@@ -192,6 +192,42 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         [\App\Http\Controllers\Admin\PaymentAdminController::class, 'retryCollection'])
         ->name('admin.payments.retry-collection');
 });
+// TaxiGo admin -------------------------------------------------------------------------------------------------------------------------------------------
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin/taxigo')
+    ->name('admin.taxigo.')
+    ->group(function () {
+        $c = 'App\\Http\\Controllers\\Admin\\TaxiGo\\';
+
+        Route::get('rides',          [$c . 'RideController', 'index'])->name('rides.index');
+        Route::get('rides/{ride}',   [$c . 'RideController', 'show'])->name('rides.show');
+
+        Route::get('drivers',                  [$c . 'DriverController', 'index'])->name('drivers.index');
+        Route::get('drivers/create',           [$c . 'DriverController', 'create'])->name('drivers.create');
+        Route::post('drivers',                 [$c . 'DriverController', 'store'])->name('drivers.store');
+        Route::get('drivers/{driver}/edit',    [$c . 'DriverController', 'edit'])->name('drivers.edit');
+        Route::put('drivers/{driver}',         [$c . 'DriverController', 'update'])->name('drivers.update');
+        Route::post('drivers/{driver}/toggle', [$c . 'DriverController', 'toggle'])->name('drivers.toggle');
+
+        Route::get('vehicles',                 [$c . 'VehicleController', 'index'])->name('vehicles.index');
+        Route::get('vehicles/create',          [$c . 'VehicleController', 'create'])->name('vehicles.create');
+        Route::post('vehicles',                [$c . 'VehicleController', 'store'])->name('vehicles.store');
+        Route::get('vehicles/{vehicle}/edit',  [$c . 'VehicleController', 'edit'])->name('vehicles.edit');
+        Route::put('vehicles/{vehicle}',       [$c . 'VehicleController', 'update'])->name('vehicles.update');
+
+        Route::get('tariffs',                                   [$c . 'TariffController', 'index'])->name('tariffs.index');
+        Route::put('tariffs/hubs/{hub}',                        [$c . 'TariffController', 'updateHub'])->name('tariffs.hub');
+        Route::put('tariffs/hubs/{hub}/zones',                  [$c . 'TariffController', 'updateZones'])->name('tariffs.zones');
+        Route::post('tariffs/zones/{zone}/neighbourhoods',      [$c . 'TariffController', 'storeNeighbourhood'])->name('tariffs.neighbourhoods.store');
+        Route::delete('tariffs/neighbourhoods/{neighbourhood}', [$c . 'TariffController', 'destroyNeighbourhood'])->name('tariffs.neighbourhoods.destroy');
+        Route::post('tariffs/hubs/{hub}/interurban',            [$c . 'TariffController', 'storeInterurban'])->name('tariffs.interurban.store');
+        Route::put('tariffs/interurban/{destination}',          [$c . 'TariffController', 'updateInterurban'])->name('tariffs.interurban.update');
+        Route::delete('tariffs/interurban/{destination}',       [$c . 'TariffController', 'destroyInterurban'])->name('tariffs.interurban.destroy');
+
+        Route::get('split', [$c . 'SplitController', 'index'])->name('split.index');
+        Route::put('split', [$c . 'SplitController', 'update'])->name('split.update');
+    });
+
 // Provider Routes ------------------------------------------------------------------------------------------------------------------------------------------
 Route::middleware(['auth', 'role:provider'])
     ->prefix('provider')

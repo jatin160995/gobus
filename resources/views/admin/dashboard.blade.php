@@ -164,7 +164,7 @@
           @foreach ($checklist as $item)
             <li>
               <span class="check-ic {{ $item['done'] ? 'is-done' : 'is-todo' }}"><i class="fas {{ $item['done'] ? 'fa-check' : 'fa-exclamation' }}"></i></span>
-              <div><div class="check-title">{{ $item['title'] }}</div><div class="check-note">{{ $item['note'] }}</div></div>
+              <div><a href="{{ $item['url'] }}" class="check-title d-block">{{ $item['title'] }}</a><div class="check-note">{{ $item['note'] }}</div></div>
             </li>
           @endforeach
         </ul>
@@ -177,8 +177,10 @@
   <div class="col-xl-4 col-lg-6">
     <div class="card h-100">
       <div class="card-header">
-        <p class="panel-title">{{ __('dashboard.split') }}</p>
-        <p class="panel-sub">{{ __('dashboard.split_sub') }}</p>
+        <div class="d-flex align-items-start justify-content-between gap-2">
+          <div><p class="panel-title">{{ __('dashboard.split') }}</p><p class="panel-sub">{{ __('dashboard.split_sub') }}</p></div>
+          <a href="{{ route('admin.taxigo.split.index') }}" class="btn btn-sm btn-outline-secondary">{{ __('taxigo.edit') }}</a>
+        </div>
       </div>
       <div class="card-body pt-2">
         @foreach ($beneficiaries as $b)
@@ -224,8 +226,10 @@
   <div class="col-xl-6">
     <div class="card h-100">
       <div class="card-header">
-        <p class="panel-title">{{ __('dashboard.tariff') }}</p>
-        <p class="panel-sub">{{ __('dashboard.tariff_sub') }}</p>
+        <div class="d-flex align-items-start justify-content-between gap-2">
+          <div><p class="panel-title">{{ __('dashboard.tariff') }}</p><p class="panel-sub">{{ __('dashboard.tariff_sub') }}</p></div>
+          <a href="{{ route('admin.taxigo.tariffs.index') }}" class="btn btn-sm btn-outline-secondary">{{ __('taxigo.edit') }}</a>
+        </div>
       </div>
       @foreach ($hubs as $hub)
         <div class="tariff-hub">

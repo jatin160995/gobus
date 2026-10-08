@@ -70,6 +70,10 @@ class ProcessMtnDisbursement implements ShouldQueue
                 'GoBus Agency Payout',
                 'Agency payout for Booking #',
             ],
+            'beneficiary_payout', 'driver_payout' => [
+                'TaxiGo Payout',
+                'TaxiGo ride #' . $transaction->booking_id,
+            ],
             default => ['GoBus Payout', 'Booking' ],
         };
 
@@ -113,6 +117,7 @@ class ProcessMtnDisbursement implements ShouldQueue
         return match ($transaction->recipient_type) {
             'provider'  => $this->getProviderMsisdn($transaction->recipient_id),
             'insurance' => $this->getInsuranceMsisdn(),   // no ID needed — single global setting
+            'beneficiary', 'driver' => \App\Services\TaxiGo\RideSplitService::recipientMsisdn($transaction),
             default     => null,
         };
     }

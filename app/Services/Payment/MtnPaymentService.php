@@ -217,6 +217,13 @@ class MtnPaymentService
                 'paid_at'        => now(),
             ]);
 
+            // TaxiGo rides have their own split and payouts
+            if ($order->booking_type === 'taxigo') {
+                app(\App\Services\TaxiGo\RidePaymentService::class)->markPaid($order);
+                DB::commit();
+                return true;
+            }
+
             // Update booking status
             $this->confirmBooking($order);
 
@@ -257,6 +264,10 @@ class MtnPaymentService
         if (!$order) return;
 
         $order->update(['payment_status' => 'failed']);
+
+        if ($order->booking_type === 'taxigo') {
+            app(\App\Services\TaxiGo\RidePaymentService::class)->markFailed($order);
+        }
 
         PaymentTransaction::where('payment_order_id', $order->id)
             ->update(['transaction_status' => 'failed']);

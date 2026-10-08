@@ -18,12 +18,33 @@ use App\Http\Controllers\Api\V1\MtnPaymentController;
 use App\Http\Controllers\Api\V1\MtnDebugController;
 use App\Http\Controllers\Api\V1\MtnHardcodedDebugController;
 use App\Http\Controllers\Api\V1\AppConfigController;
+use App\Http\Controllers\Api\V1\TaxiGo\HubController as TaxiGoHubController;
+use App\Http\Controllers\Api\V1\TaxiGo\QuoteController as TaxiGoQuoteController;
+use App\Http\Controllers\Api\V1\TaxiGo\RideController as TaxiGoRideController;
 
 Route::get('/', function () {
     return response()->json(['message' => 'GO API is running']);
 });
 
 Route::get('/app-config', [AppConfigController::class, 'show']);
+
+/*
+|--------------------------------------------------------------------------
+| TaxiGo — customer app
+|--------------------------------------------------------------------------
+*/
+Route::prefix('taxigo')->group(function () {
+    Route::get('hubs',   [TaxiGoHubController::class, 'index']);
+    Route::post('quote', [TaxiGoQuoteController::class, 'store'])->middleware('throttle:60,1');
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('rides',               [TaxiGoRideController::class, 'index']);
+        Route::post('rides',              [TaxiGoRideController::class, 'store'])->middleware('throttle:20,1');
+        Route::get('rides/{ref}',         [TaxiGoRideController::class, 'show']);
+        Route::post('rides/{ref}/pay',    [TaxiGoRideController::class, 'pay'])->middleware('throttle:10,1');
+        Route::post('rides/{ref}/cancel', [TaxiGoRideController::class, 'cancel']);
+    });
+});
 
 /*
 |--------------------------------------------------------------------------

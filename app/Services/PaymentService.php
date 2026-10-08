@@ -159,7 +159,7 @@ class PaymentService
         }
 
         // Step 4 — Only process if Orange confirms SUCCESS
-        if (strtolower($confirmedStatus) !== 'success') {
+        if (!in_array(strtolower((string) $confirmedStatus), ['success', 'successfull', 'successful'])) {
             Log::warning('Payment not confirmed by Orange', [
                 'pay_token' => $payToken,
                 'status'    => $confirmedStatus,
@@ -168,6 +168,10 @@ class PaymentService
             // Mark as failed if Orange says failed
             if (in_array(strtolower($confirmedStatus), ['failed', 'expired', 'cancelled'])) {
                 $paymentOrder->update(['payment_status' => 'failed']);
+
+                if ($paymentOrder->booking_type === 'taxigo') {
+                    app(\App\Services\TaxiGo\RidePaymentService::class)->markFailed($paymentOrder);
+                }
             }
 
             return false;
@@ -182,7 +186,12 @@ class PaymentService
                 'paid_at'                => now(),
             ]);
 
-            // Step 6 — Update booking status
+            // Step 6 — Update booking status (TaxiGo rides have their own split and payouts)
+            if ($paymentOrder->booking_type === 'taxigo') {
+                app(\App\Services\TaxiGo\RidePaymentService::class)->markPaid($paymentOrder);
+                return;
+            }
+
             $this->confirmBooking(
                 $paymentOrder->booking_id,
                 $paymentOrder->booking_type
@@ -194,6 +203,10 @@ class PaymentService
                 'booking_type'    => $paymentOrder->booking_type,
             ]);
         });
+
+        if ($paymentOrder->booking_type === 'taxigo') {
+            return true;
+        }
 
         // Step 7 — Dispatch split payment job (runs in background)
         ProcessSplitPayment::dispatch($paymentOrder->id)

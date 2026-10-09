@@ -22,22 +22,32 @@
     </a>
 
     <div class="go-nav-label">{{ __('taxigo.menu') }}</div>
+    @if (Modules::adminPage('rides'))
     <a class="go-nav-link {{ request()->routeIs('admin.taxigo.rides.*') ? 'active' : '' }}" href="{{ route('admin.taxigo.rides.index') }}">
       <i class="fas fa-taxi"></i><span>{{ __('taxigo.rides') }}</span>
       @if ($activeRides > 0)<span class="go-nav-tag">{{ $activeRides }}</span>@endif
     </a>
+    @endif
+    @if (Modules::adminPage('drivers'))
     <a class="go-nav-link {{ request()->routeIs('admin.taxigo.drivers.*') ? 'active' : '' }}" href="{{ route('admin.taxigo.drivers.index') }}">
       <i class="fas fa-id-badge"></i><span>{{ __('taxigo.drivers') }}</span>
     </a>
+    @endif
+    @if (Modules::adminPage('vehicles'))
     <a class="go-nav-link {{ request()->routeIs('admin.taxigo.vehicles.*') ? 'active' : '' }}" href="{{ route('admin.taxigo.vehicles.index') }}">
       <i class="fas fa-car-side"></i><span>{{ __('taxigo.vehicles') }}</span>
     </a>
+    @endif
+    @if (Modules::adminPage('tariffs'))
     <a class="go-nav-link {{ request()->routeIs('admin.taxigo.tariffs.*') ? 'active' : '' }}" href="{{ route('admin.taxigo.tariffs.index') }}">
       <i class="fas fa-tags"></i><span>{{ __('taxigo.tariffs') }}</span>
     </a>
+    @endif
+    @if (Modules::adminPage('split'))
     <a class="go-nav-link {{ request()->routeIs('admin.taxigo.split.*') ? 'active' : '' }}" href="{{ route('admin.taxigo.split.index') }}">
       <i class="fas fa-chart-pie"></i><span>{{ __('taxigo.split') }}</span>
     </a>
+    @endif
 
     <div class="go-nav-label">{{ __('sidebar.operations') }}</div>
     <a class="go-nav-link {{ request()->routeIs('admin.users.*', 'admin.user.*') ? 'active' : '' }}" href="{{ route('admin.users.list') }}">

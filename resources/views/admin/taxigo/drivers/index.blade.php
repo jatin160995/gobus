@@ -2,6 +2,8 @@
 
 @section('title', __('taxigo.drivers'))
 
+@php $showVehicles = \App\Support\Modules::adminPage('vehicles'); @endphp
+
 @section('content')
 <div class="go-page-head">
   <div>
@@ -54,7 +56,7 @@
           <tr>
             <th>{{ __('taxigo.driver') }}</th>
             <th>{{ __('taxigo.hub') }}</th>
-            <th>{{ __('taxigo.vehicle') }}</th>
+            @if ($showVehicles)<th>{{ __('taxigo.vehicle') }}</th>@endif
             <th>{{ __('taxigo.payout') }}</th>
             <th class="text-right">{{ __('taxigo.completed_rides') }}</th>
             <th>{{ __('taxigo.status') }}</th>
@@ -78,6 +80,7 @@
                 </div>
               </td>
               <td><span class="hub-code">{{ $d->hub->code }}</span></td>
+              @if ($showVehicles)
               <td>
                 @if ($d->vehicle)
                   <span class="plate">{{ $d->vehicle->plate }}</span>
@@ -86,6 +89,7 @@
                   <span class="text-muted">—</span>
                 @endif
               </td>
+              @endif
               <td>
                 <span class="split-chip {{ $d->payout_channel === 'orange' ? 'is-orange' : 'is-mtn' }}">{{ strtoupper($d->payout_channel) }}</span>
                 <div class="person-sub mt-1">{{ $d->payout_msisdn }}</div>

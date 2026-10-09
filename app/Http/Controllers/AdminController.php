@@ -111,20 +111,20 @@ class AdminController extends Controller
         $splitTotal = (float) $beneficiaries->where('is_active', true)->sum('percent');
         $commission = (float) Setting::getValue('taxigo_referral_commission_amount', 0);
 
-        return [
+        return array_values(array_filter([
             ['done' => abs($splitTotal - 100) < 0.01, 'title' => __('dashboard.check_split'), 'url' => route('admin.taxigo.split.index'),
              'note' => __('dashboard.check_split_note', ['total' => rtrim(rtrim(number_format($splitTotal, 2), '0'), '.')])],
             ['done' => $configured->count() === $payoutRows->count() && $payoutRows->isNotEmpty(), 'title' => __('dashboard.check_accounts'), 'url' => route('admin.taxigo.split.index'),
              'note' => __('dashboard.check_accounts_note', ['done' => $configured->count(), 'total' => $payoutRows->count()])],
             ['done' => $driverCount > 0, 'title' => __('dashboard.check_drivers'), 'url' => route('admin.taxigo.drivers.index'),
              'note' => trans_choice('dashboard.check_drivers_note', $driverCount, ['count' => $driverCount])],
-            ['done' => $vehicleCount > 0, 'title' => __('dashboard.check_vehicles'), 'url' => route('admin.taxigo.vehicles.index'),
+            ['hidden' => !Modules::adminPage('vehicles'), 'done' => $vehicleCount > 0, 'title' => __('dashboard.check_vehicles'), 'url' => route('admin.taxigo.vehicles.index'),
              'note' => trans_choice('dashboard.check_vehicles_note', $vehicleCount, ['count' => $vehicleCount])],
             ['done' => $commission > 0, 'title' => __('dashboard.check_commission'), 'url' => route('settings.index'),
              'note' => $commission > 0 ? number_format($commission) . ' XAF' : __('dashboard.not_set')],
             ['done' => filled(Setting::getValue('taxigo_support_phone')), 'title' => __('dashboard.check_support'), 'url' => route('settings.index'),
              'note' => Setting::getValue('taxigo_support_phone') ?: __('dashboard.not_set')],
-        ];
+        ], fn ($item) => empty($item['hidden'])));
     }
     public function usersList()
 {

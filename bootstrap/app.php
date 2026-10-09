@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'taxigo.page' => \App\Http\Middleware\TaxiGoAdminPage::class,
         ]);
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,

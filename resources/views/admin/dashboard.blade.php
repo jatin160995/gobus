@@ -77,7 +77,7 @@
     <div class="card h-100"><div class="kpi">
       <div class="kpi-top"><span class="kpi-label">{{ __('dashboard.drivers_online') }}</span><span class="kpi-icon is-blue"><i class="fas fa-id-badge"></i></span></div>
       <div class="kpi-value">{{ $drivers['online'] }}<small>/ {{ $drivers['total'] }}</small></div>
-      <div class="kpi-foot">{{ __('dashboard.of_drivers', ['count' => $drivers['total']]) }} · {{ __('dashboard.vehicles', ['count' => $vehicles]) }}</div>
+      <div class="kpi-foot">{{ __('dashboard.of_drivers', ['count' => $drivers['total']]) }}@if (\App\Support\Modules::adminPage('vehicles')) · {{ __('dashboard.vehicles', ['count' => $vehicles]) }}@endif</div>
     </div></div>
   </div>
   <div class="col-sm-6 col-xl-3">
@@ -222,6 +222,8 @@
 </div>
 
 <div class="row g-3">
+  @php $showTariff = \App\Support\Modules::adminPage('tariffs'); @endphp
+  @if ($showTariff)
   {{-- Tariff --}}
   <div class="col-xl-6">
     <div class="card h-100">
@@ -257,8 +259,10 @@
     </div>
   </div>
 
+  @endif
+
   {{-- Recent payments --}}
-  <div class="col-xl-6">
+  <div class="{{ $showTariff ? 'col-xl-6' : 'col-12' }}">
     <div class="card h-100">
       <div class="card-header d-flex align-items-center justify-content-between">
         <p class="panel-title">{{ __('dashboard.recent') }}</p>

@@ -34,6 +34,12 @@ class Modules
         return static::$cache[$module] ??= (bool) (int) Setting::getValue("module_{$module}_enabled", '1');
     }
 
+    /** TaxiGo admin pages switched on in config/taxigo.php */
+    public static function adminPage(string $page): bool
+    {
+        return (bool) config("taxigo.admin_pages.{$page}", true);
+    }
+
     public static function toArray(): array
     {
         return [

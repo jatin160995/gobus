@@ -16,12 +16,11 @@ return [
     'unpaid_expiry_minutes' => 60,
 
     // Admin pages shown in the menu. Hidden pages also return 404.
-    // Rides, vehicles and tariffs are held back until they are presented to the client.
     'admin_pages' => [
         'drivers'  => true,
         'split'    => true,
-        'rides'    => false,
-        'vehicles' => false,
-        'tariffs'  => false,
+        'rides'    => true,
+        'vehicles' => true,
+        'tariffs'  => true,
     ],
 ];

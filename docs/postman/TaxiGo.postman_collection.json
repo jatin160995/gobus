@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "3ceb22e4-b12d-44c3-8cd1-53374e62af57",
     "name": "GoAPI – TaxiGo",
-    "description": "TaxiGo endpoints of the GO API. Move the TaxiGo folder into your GoAPI collection, or keep this collection to share.",
+    "description": "TaxiGo endpoints of the GO API. URLs use {{baseUrl}}, which must end with /api/ (local: http://127.0.0.1:8000/api/, staging: http://40.66.32.153/go-admin/api/). Move the TaxiGo folder into GoAPI to use its baseUrl, or keep this collection to share.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -24,19 +24,19 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/auth/login",
+              "raw": "{{baseUrl}}auth/login",
               "host": [
-                "{{base_url}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "auth",
                 "login"
               ]
             },
-            "description": "Signs in a **customer** and returns the API token used by every ride request.\n\nSet the collection variables `username` (email or phone) and `password` first. The test script saves the token into `{{token}}` automatically.\n\n| Field | Required | Notes |\n|---|---|---|\n| username | yes | Email or phone number |\n| password | yes | |\n| device_name, device_os, device_model, fcm_token, app_version | yes | Device details. Postman sends fixed test values |",
+            "description": "Signs in a **customer** and returns the API token used by every ride request.\n\nSet the collection variables `username` (email or phone) and `password` first. The test script saves the token into `{{token}}` automatically.\n\n| Field | Required | Notes |\n|---|---|---|\n| username | yes | Email or phone number |\n| password | yes | |\n| device_name, device_os, device_model, fcm_token, app_version | yes | Device details. Postman sends fixed test values |\n\n`device_name` includes the username: the API stores one device row per device name, so a shared name would move device rows between accounts.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\",\n  \"device_name\": \"Postman\",\n  \"device_os\": \"postman\",\n  \"device_model\": \"Postman\",\n  \"fcm_token\": \"postman-test\",\n  \"app_version\": \"1.0.0\"\n}",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\",\n  \"device_name\": \"Postman ({{username}})\",\n  \"device_os\": \"postman\",\n  \"device_model\": \"Postman\",\n  \"fcm_token\": \"postman-test\",\n  \"app_version\": \"1.0.0\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -63,9 +63,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/auth/login",
+                  "raw": "{{baseUrl}}auth/login",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "auth",
@@ -74,7 +74,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\",\n  \"device_name\": \"Postman\",\n  \"device_os\": \"postman\",\n  \"device_model\": \"Postman\",\n  \"fcm_token\": \"postman-test\",\n  \"app_version\": \"1.0.0\"\n}",
+                  "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\",\n  \"device_name\": \"Postman ({{username}})\",\n  \"device_os\": \"postman\",\n  \"device_model\": \"Postman\",\n  \"fcm_token\": \"postman-test\",\n  \"app_version\": \"1.0.0\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -100,9 +100,10 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Request succeeded', () => pm.expect(pm.response.json().status).to.eql(true));",
-                  "const d = pm.response.json();",
-                  "if (d.status) { pm.collectionVariables.set('token', d.data.token); }"
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Signed in', () => pm.expect(d.status).to.eql(true));",
+                  "if (d.status && d.data && d.data.token) { pm.collectionVariables.set('token', d.data.token); }"
                 ]
               }
             }
@@ -119,9 +120,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/taxigo/hubs",
+              "raw": "{{baseUrl}}taxigo/hubs",
               "host": [
-                "{{base_url}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "taxigo",
@@ -145,9 +146,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/hubs",
+                  "raw": "{{baseUrl}}taxigo/hubs",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -173,14 +174,22 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Request succeeded', () => pm.expect(pm.response.json().status).to.eql(true));",
-                  "const hubs = pm.response.json().data;",
-                  "const dla = hubs.find(h => h.code === 'DLA') || hubs[0];",
-                  "pm.collectionVariables.set('hub_id', dla.id);",
-                  "const zoneB = dla.zones.find(z => z.code === 'B') || dla.zones[0];",
-                  "pm.collectionVariables.set('neighbourhood_id', zoneB.neighbourhoods[0].id);",
-                  "const nsi = hubs.find(h => h.code === 'NSI');",
-                  "if (nsi) { pm.collectionVariables.set('nsi_hub_id', nsi.id); const kribi = nsi.interurban.find(d => d.name === 'Kribi') || nsi.interurban[0]; pm.collectionVariables.set('destination_id', kribi.id); }"
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Airports loaded', () => pm.expect(d.status).to.eql(true));",
+                  "if (d.status && Array.isArray(d.data) && d.data.length) {",
+                  "  const hubs = d.data;",
+                  "  const dla = hubs.find(h => h.code === 'DLA') || hubs[0];",
+                  "  pm.collectionVariables.set('hub_id', dla.id);",
+                  "  const zoneB = dla.zones.find(z => z.code === 'B') || dla.zones[0];",
+                  "  if (zoneB && zoneB.neighbourhoods.length) { pm.collectionVariables.set('neighbourhood_id', zoneB.neighbourhoods[0].id); }",
+                  "  const nsi = hubs.find(h => h.code === 'NSI');",
+                  "  if (nsi) {",
+                  "    pm.collectionVariables.set('nsi_hub_id', nsi.id);",
+                  "    const kribi = nsi.interurban.find(x => x.name === 'Kribi') || nsi.interurban[0];",
+                  "    if (kribi) { pm.collectionVariables.set('destination_id', kribi.id); }",
+                  "  }",
+                  "}"
                 ]
               }
             }
@@ -201,9 +210,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/taxigo/quote",
+              "raw": "{{baseUrl}}taxigo/quote",
               "host": [
-                "{{base_url}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "taxigo",
@@ -240,9 +249,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/quote",
+                  "raw": "{{baseUrl}}taxigo/quote",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -285,9 +294,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/quote",
+                  "raw": "{{baseUrl}}taxigo/quote",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -330,9 +339,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/quote",
+                  "raw": "{{baseUrl}}taxigo/quote",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -375,9 +384,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/quote",
+                  "raw": "{{baseUrl}}taxigo/quote",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -412,7 +421,9 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Request succeeded', () => pm.expect(pm.response.json().status).to.eql(true));"
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Request succeeded', () => pm.expect(d.status).to.eql(true));"
                 ]
               }
             },
@@ -444,9 +455,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/taxigo/rides",
+              "raw": "{{baseUrl}}taxigo/rides",
               "host": [
-                "{{base_url}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "taxigo",
@@ -480,9 +491,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides",
+                  "raw": "{{baseUrl}}taxigo/rides",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -525,9 +536,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides",
+                  "raw": "{{baseUrl}}taxigo/rides",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -570,9 +581,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides",
+                  "raw": "{{baseUrl}}taxigo/rides",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -615,9 +626,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides",
+                  "raw": "{{baseUrl}}taxigo/rides",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -652,9 +663,10 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Request succeeded', () => pm.expect(pm.response.json().status).to.eql(true));",
-                  "const d = pm.response.json();",
-                  "if (d.status) { pm.collectionVariables.set('ride_ref', d.data.ref); }"
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Ride booked', () => pm.expect(d.status).to.eql(true));",
+                  "if (d.status && d.data && d.data.ref) { pm.collectionVariables.set('ride_ref', d.data.ref); }"
                 ]
               }
             },
@@ -682,9 +694,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/taxigo/rides?scope=upcoming",
+              "raw": "{{baseUrl}}taxigo/rides?scope=upcoming",
               "host": [
-                "{{base_url}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "taxigo",
@@ -711,9 +723,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides?scope=upcoming",
+                  "raw": "{{baseUrl}}taxigo/rides?scope=upcoming",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -749,9 +761,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides?scope=past",
+                  "raw": "{{baseUrl}}taxigo/rides?scope=past",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -783,7 +795,9 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Request succeeded', () => pm.expect(pm.response.json().status).to.eql(true));"
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Request succeeded', () => pm.expect(d.status).to.eql(true));"
                 ]
               }
             }
@@ -800,9 +814,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/taxigo/rides/{{ride_ref}}",
+              "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}",
               "host": [
-                "{{base_url}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "taxigo",
@@ -824,9 +838,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides/{{ride_ref}}",
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -857,9 +871,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides/{{ride_ref}}",
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -890,9 +904,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides/{{ride_ref}}",
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -919,7 +933,9 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Request succeeded', () => pm.expect(pm.response.json().status).to.eql(true));"
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Request succeeded', () => pm.expect(d.status).to.eql(true));"
                 ]
               }
             }
@@ -940,9 +956,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/taxigo/rides/{{ride_ref}}/pay",
+              "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}/pay",
               "host": [
-                "{{base_url}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "taxigo",
@@ -978,9 +994,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides/{{ride_ref}}/pay",
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}/pay",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -1025,9 +1041,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides/{{ride_ref}}/pay",
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}/pay",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -1064,7 +1080,9 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Request succeeded', () => pm.expect(pm.response.json().status).to.eql(true));"
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Request succeeded', () => pm.expect(d.status).to.eql(true));"
                 ]
               }
             }
@@ -1085,9 +1103,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/taxigo/rides/{{ride_ref}}/cancel",
+              "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}/cancel",
               "host": [
-                "{{base_url}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "taxigo",
@@ -1123,9 +1141,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides/{{ride_ref}}/cancel",
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}/cancel",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -1170,9 +1188,9 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/taxigo/rides/{{ride_ref}}/cancel",
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}/cancel",
                   "host": [
-                    "{{base_url}}"
+                    "{{baseUrl}}"
                   ],
                   "path": [
                     "taxigo",
@@ -1209,7 +1227,9 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Request succeeded', () => pm.expect(pm.response.json().status).to.eql(true));"
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Request succeeded', () => pm.expect(d.status).to.eql(true));"
                 ]
               }
             }
@@ -1231,9 +1251,10 @@
   ],
   "variable": [
     {
-      "key": "base_url",
-      "value": "http://40.66.32.153/go-admin/api",
-      "type": "string"
+      "key": "baseUrl",
+      "value": "http://40.66.32.153/go-admin/api/",
+      "type": "string",
+      "description": "Must end with /api/ — local: http://127.0.0.1:8000/api/"
     },
     {
       "key": "username",

@@ -42,4 +42,27 @@ return Application::configure(basePath: dirname(__DIR__))
         // Default behavior for web
         return redirect()->guest('login');
     });
+
+    // API errors use the same {status: false, message} shape as the rest of the API
+    $exceptions->render(function (\Illuminate\Validation\ValidationException $e, $request) {
+        if ($request->is('api/*')) {
+            return response()->json([
+                'status'  => false,
+                'message' => collect($e->errors())->flatten()->first() ?? 'The data sent is not valid.',
+                'errors'  => $e->errors(),
+            ], 422);
+        }
+    });
+
+    $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, $request) {
+        if ($request->is('api/*')) {
+            return response()->json(['status' => false, 'message' => 'Not found.'], 404);
+        }
+    });
+
+    $exceptions->render(function (\Illuminate\Http\Exceptions\ThrottleRequestsException $e, $request) {
+        if ($request->is('api/*')) {
+            return response()->json(['status' => false, 'message' => 'Too many requests. Try again in a minute.'], 429);
+        }
+    });
     })->create();

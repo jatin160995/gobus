@@ -19,4 +19,12 @@ class StoreRideRequest extends QuoteRequest
             'notes'             => ['nullable', 'string', 'max:500'],
         ];
     }
+
+    public function messages(): array
+    {
+        return parent::messages() + [
+            'location.required_if'      => 'Add the pickup or drop-off address in the city.',
+            'location.address.required_with' => 'Add the address of the pin.',
+        ];
+    }
 }

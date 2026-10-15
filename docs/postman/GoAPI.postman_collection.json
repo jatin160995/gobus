@@ -1,0 +1,2868 @@
+{
+  "info": {
+    "_postman_id": "798c6b66-3c23-4cf2-8f35-730f774bd8c5",
+    "name": "GoAPI",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "4504452",
+    "description": "GO API (GoBus, GoRent, TaxiGo). {{baseUrl}} must end with /api/ — local: http://127.0.0.1:8000/api/, staging: http://40.66.32.153/go-admin/api/. Put credentials in Current value only, never Initial value."
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "email",
+                  "value": "test8@gmail.com",
+                  "type": "text",
+                  "uuid": "2bbd72b6-c41e-4cac-9934-3659d4a5a919"
+                },
+                {
+                  "key": "name",
+                  "value": "Jatin",
+                  "type": "text",
+                  "uuid": "75bc1387-f1f5-457c-b94f-bd6c4b85adc2"
+                },
+                {
+                  "key": "phone",
+                  "value": "8528071910",
+                  "type": "text",
+                  "uuid": "a9fc8ebb-9f25-4a06-9d8c-01f8d39bd5c5"
+                },
+                {
+                  "key": "password",
+                  "value": "123456",
+                  "type": "text",
+                  "uuid": "d030c47c-3c0f-494b-b87d-62f8dfa5e291"
+                },
+                {
+                  "key": "fcm_token",
+                  "value": "resgistertoken",
+                  "type": "text",
+                  "uuid": "0dfd354c-a934-4639-849d-b258d8d81f14"
+                },
+                {
+                  "key": "device_name",
+                  "value": "apple",
+                  "type": "text",
+                  "uuid": "ad79cf92-3a50-4f7d-9853-f0d9bccbac0e"
+                },
+                {
+                  "key": "device_os",
+                  "value": "iOS",
+                  "type": "text",
+                  "uuid": "b87c0fd7-df36-43d4-b794-21ce491c7dc4"
+                },
+                {
+                  "key": "device_model",
+                  "value": "17",
+                  "type": "text",
+                  "uuid": "683d1f09-5ba0-415f-b4cc-2e887e687ad0"
+                },
+                {
+                  "key": "app_version",
+                  "value": "1.0",
+                  "type": "text",
+                  "uuid": "ec822821-6f60-4b71-ab20-2dc17bc6cfdd"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}auth/register",
+              "host": [
+                "{{baseUrl}}auth"
+              ],
+              "path": [
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "username",
+                  "value": "{{username}}",
+                  "type": "text",
+                  "uuid": "7049e895-86cc-45dd-b539-1e39055909f1"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "text",
+                  "uuid": "51a4927b-5a24-41ab-9f7e-b3782059ee25"
+                },
+                {
+                  "key": "device_name",
+                  "value": "Postman ({{username}})",
+                  "type": "text",
+                  "uuid": "c1784136-c25d-479d-bcd6-a0c9980e6b4d"
+                },
+                {
+                  "key": "device_os",
+                  "value": "iOS",
+                  "type": "text",
+                  "uuid": "0917878d-016f-4c7f-8bac-034cf73e0258"
+                },
+                {
+                  "key": "device_model",
+                  "value": "17",
+                  "type": "text",
+                  "uuid": "c9a3970b-a2d9-4d94-8619-c620105699e2"
+                },
+                {
+                  "key": "fcm_token",
+                  "value": "cnhudscuhdsncuxxxxss",
+                  "type": "text",
+                  "uuid": "e8733ff2-ea19-4217-a6fa-ad91c30cf662"
+                },
+                {
+                  "key": "app_version",
+                  "value": "1.0",
+                  "type": "text",
+                  "uuid": "f994c855-0295-4641-9bff-babfdf850726"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}auth/login",
+              "host": [
+                "{{baseUrl}}auth"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Signed in', () => pm.expect(d.status).to.eql(true));",
+                  "if (d.status) { const v = d.data && d.data.token; if (v !== undefined && v !== null) pm.collectionVariables.set('token', v); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}auth/profile",
+              "host": [
+                "{{baseUrl}}auth"
+              ],
+              "path": [
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "user_id",
+                  "value": "9",
+                  "type": "text",
+                  "uuid": "5c65fc89-9332-4686-b873-0d389a5b56f3"
+                },
+                {
+                  "key": "otp",
+                  "value": "879946",
+                  "type": "text",
+                  "uuid": "cb03a625-a228-45cf-9976-991954835aa4"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}auth/verify-otp",
+              "host": [
+                "{{baseUrl}}auth"
+              ],
+              "path": [
+                "verify-otp"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}auth/logout",
+              "host": [
+                "{{baseUrl}}auth"
+              ],
+              "path": [
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "Starts a password reset for a phone number. ⚠️ Currently returns the OTP in the response and does not send it: must be fixed before launch.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "phone",
+                  "value": "{{username}}",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('OTP requested', () => pm.expect(d.status).to.eql(true));",
+                  "if (d.status) { const v = d.data && d.data.user_id; if (v !== undefined && v !== null) pm.collectionVariables.set('user_id', v); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reset password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "⚠️ SECURITY: currently resets the password of any user_id without checking an OTP. Must be fixed before launch.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "user_id",
+                  "value": "{{user_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{new_password}}",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": []
+        }
+      ]
+    },
+    {
+      "name": "App",
+      "item": [
+        {
+          "name": "App config",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}app-config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "app-config"
+              ]
+            },
+            "description": "Which services the app shows (TaxiGo, GoBus, GoRent), support phone and currency. Read by the GO app at start-up.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": []
+        }
+      ]
+    },
+    {
+      "name": "Search Car",
+      "item": [
+        {
+          "name": "Search Car",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"from_city_id\": 4,\n    \"to_city_id\": 5,\n    \"trip_type\": \"round_trip\",\n    \"pickup_date\": \"2026-03-23 10:00:00\",\n    \"pickup_time\": \"10:00:00\",\n    \"return_date\": \"2026-03-24\",\n    \"passengers\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}car/search",
+              "host": [
+                "{{baseUrl}}car"
+              ],
+              "path": [
+                "search"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Car Route Detail",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"route_id\": 3,\n  \"vehicle_category\": \"standard\",\n  \"trip_type\": \"round_trip\",\n  \"pickup_date\": \"2026-03-23\",\n  \"pickup_time\": \"10:00\",\n  \"return_date\": \"2026-03-24\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}car/route-details",
+              "host": [
+                "{{baseUrl}}car"
+              ],
+              "path": [
+                "route-details"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Car Booking",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"route_id\": 3,\n  \"vehicle_category\": \"standard\",\n  \"trip_type\": \"round_trip\",\n  \"pickup_datetime\": \"2026-03-23 10:00:00\",\n  \"return_datetime\": \"2026-03-24 10:00:00\",\n  \"pickup_address\": \"Douala Airport\",\n  \"drop_address\": \"Yaounde Hilton\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}car/bookings",
+              "host": [
+                "{{baseUrl}}car"
+              ],
+              "path": [
+                "bookings"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "item": [
+        {
+          "name": "Search Bus",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "from",
+                  "value": "DLA",
+                  "type": "text",
+                  "uuid": "d8741191-1b58-4284-a591-3b539b345dc5"
+                },
+                {
+                  "key": "to",
+                  "value": "YDE",
+                  "type": "text",
+                  "uuid": "43e3c057-06c3-4bd1-89b4-aaf481efd8f8"
+                },
+                {
+                  "key": "date",
+                  "value": "2026-04-02",
+                  "type": "text",
+                  "uuid": "8e3d0df7-ba74-49d0-8aa9-bd53932ef1ac"
+                },
+                {
+                  "key": "passengers",
+                  "value": "1",
+                  "type": "text",
+                  "uuid": "9a6bfb7b-5b7f-414c-b6d8-c35f3aa0fa70"
+                },
+                {
+                  "key": "trip_type",
+                  "value": "round_trip",
+                  "type": "text",
+                  "uuid": "7e07904d-b7af-464a-a0f2-f1fa20d8c845"
+                },
+                {
+                  "key": "return_date",
+                  "value": "2026-04-04",
+                  "type": "text",
+                  "uuid": "9319a0da-93d4-4e16-a3df-c4d4d6795b9d"
+                },
+                {
+                  "key": "children",
+                  "value": "1",
+                  "type": "text",
+                  "uuid": "972464cd-049c-4062-934a-65c499e9b4e6",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}trips/search",
+              "host": [
+                "{{baseUrl}}trips"
+              ],
+              "path": [
+                "search"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Trip Details One Way",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}trips/179/details?trip_type=one_way&adult=1&children=1",
+              "host": [
+                "{{baseUrl}}trips"
+              ],
+              "path": [
+                "179",
+                "details"
+              ],
+              "query": [
+                {
+                  "key": "trip_type",
+                  "value": "one_way"
+                },
+                {
+                  "key": "return_schedule_id",
+                  "value": "66921",
+                  "disabled": true
+                },
+                {
+                  "key": "adult",
+                  "value": "1"
+                },
+                {
+                  "key": "children",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Trip Details Round",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}trips/179/details?trip_type=round_trip&adult=1&children=1&return_schedule_id=220",
+              "host": [
+                "{{baseUrl}}trips"
+              ],
+              "path": [
+                "179",
+                "details"
+              ],
+              "query": [
+                {
+                  "key": "trip_type",
+                  "value": "round_trip"
+                },
+                {
+                  "key": "adult",
+                  "value": "1"
+                },
+                {
+                  "key": "children",
+                  "value": "1"
+                },
+                {
+                  "key": "return_schedule_id",
+                  "value": "220",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "City Search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}cities/search",
+              "host": [
+                "{{baseUrl}}cities"
+              ],
+              "path": [
+                "search"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orange SMS",
+      "item": [
+        {
+          "name": "Get Token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{orange_sms_username}}\",\n  \"password\": \"{{orange_sms_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.orange.cm/messaging/api/v1/authenticate",
+              "protocol": "https",
+              "host": [
+                "api",
+                "orange",
+                "cm"
+              ],
+              "path": [
+                "messaging",
+                "api",
+                "v1",
+                "authenticate"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "const t = d.access_token || d.token || (d.data && (d.data.access_token || d.data.token));",
+                  "pm.test('Token received', () => pm.expect(t).to.be.a('string'));",
+                  "if (t) { pm.collectionVariables.set('orange_sms_token', t); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Send SMS",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{orange_sms_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"campaignTitle\": \"Test\",\n  \"messageContent\": \"Votre mobilité est notre priorité ! Pour un service plus performant, l'appli sera dispo en MAI. Merci de votre confiance. Hâte de vous compter parmi nous. ALO\",\n  \"projectName\": \"TestP\",\n  \"recipients\": [\n    \"{{sms_test_number}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.orange.cm/messaging/api/v1/sms/simple",
+              "protocol": "https",
+              "host": [
+                "api",
+                "orange",
+                "cm"
+              ],
+              "path": [
+                "messaging",
+                "api",
+                "v1",
+                "sms",
+                "simple"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orange Payment",
+      "item": [
+        {
+          "name": "Webhook Orange Payment",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"payToken\": \"test123\", \"status\": \"SUCCESS\", \"txnid\": \"TXN001\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}orange/webhook",
+              "host": [
+                "{{baseUrl}}orange"
+              ],
+              "path": [
+                "webhook"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Initiate",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"booking_id\": 1,\n    \"booking_type\": \"car\",\n    \"msisdn\": \"237690000001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}payments/initiate",
+              "host": [
+                "{{baseUrl}}payments"
+              ],
+              "path": [
+                "initiate"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Payment request sent', () => pm.expect(d.status).to.eql(true));",
+                  "if (d.status) { const v = d.data && d.data.order_reference; if (v !== undefined && v !== null) pm.collectionVariables.set('order_reference', v); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Payment status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}payments/status/{{order_reference}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "status",
+                "{{order_reference}}"
+              ]
+            },
+            "description": "Status of an Orange Money payment (poll after Initiate).",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": []
+        }
+      ]
+    },
+    {
+      "name": "Passengers",
+      "item": [
+        {
+          "name": "PassengersList",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}passengers",
+              "host": [
+                "{{baseUrl}}passengers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Passenger",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Smith\",\n  \"phone\": \"+237612345678\",\n  \"gender\": \"male\",\n  \"id_number\": \"CM123456\",\n  \"is_default\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}passengers",
+              "host": [
+                "{{baseUrl}}passengers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get single passenger",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Smith\",\n  \"phone\": \"+237612345678\",\n  \"gender\": \"male\",\n  \"id_number\": \"CM123456\",\n  \"is_default\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}passengers/1",
+              "host": [
+                "{{baseUrl}}passengers"
+              ],
+              "path": [
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update passenger",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Smith 1\",\n  \"phone\": \"+237612345678\",\n  \"gender\": \"male\",\n  \"id_number\": \"CM123456\",\n  \"is_default\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}passengers/1",
+              "host": [
+                "{{baseUrl}}passengers"
+              ],
+              "path": [
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete passenger",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}passengers/1",
+              "host": [
+                "{{baseUrl}}passengers"
+              ],
+              "path": [
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "MTN Momo Payment",
+      "item": [
+        {
+          "name": "Initiate MTN payment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": 1,\n  \"booking_type\": \"car\",\n  \"msisdn\": \"672808725\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}payments/mtn/initiate",
+              "host": [
+                "{{baseUrl}}payments"
+              ],
+              "path": [
+                "mtn",
+                "initiate"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Payment request sent', () => pm.expect(d.status).to.eql(true));",
+                  "if (d.status) { const v = d.data && d.data.reference_id; if (v !== undefined && v !== null) pm.collectionVariables.set('mtn_reference_id', v); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "debug Tokens (local only)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}debug/mtn-headers",
+              "host": [
+                "{{baseUrl}}debug"
+              ],
+              "path": [
+                "mtn-headers"
+              ]
+            },
+            "description": "Debug route. Only exists when APP_ENV=local: returns 404 on the server."
+          },
+          "response": []
+        },
+        {
+          "name": "Poll status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}payments/mtn/status/{{mtn_reference_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "mtn",
+                "status",
+                "{{mtn_reference_id}}"
+              ]
+            },
+            "description": "Poll every 5 seconds, up to 2 minutes, after Initiate MTN payment.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": []
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "MTN Collection",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\" : true,\n    \"message\" : \"Test message\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}mtn/webhook/collection",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "mtn",
+                "webhook",
+                "collection"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MTN Disbursement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Reference-Id",
+                "value": "{{mtn_disbursement_reference}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}mtn/webhook/disbursement",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "mtn",
+                "webhook",
+                "disbursement"
+              ]
+            },
+            "description": "Called by MTN when a payout finishes. The X-Reference-Id header identifies the payout.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"SUCCESSFUL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": []
+        }
+      ]
+    },
+    {
+      "name": "BusBooking",
+      "item": [
+        {
+          "name": "One Way Booking",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"schedule_id\": 182,\n    \"trip_type\": \"one_way\",\n    \"seat_numbers\": [\"1\", \"2\"],\n    \"passengers\": [\n        {\n            \"name\": \"Jean Paul Mbarga\",\n            \"phone\": \"237612345678\",\n            \"gender\": \"male\",\n            \"id_number\": \"CM123456\"\n        },\n        {\n            \"name\": \"Marie Claire Ngo\",\n            \"phone\": \"237698765432\",\n            \"gender\": \"female\",\n            \"id_number\": \"CM654321\"\n        }\n    ],\n    \"notes\": \"Window seats preferred\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}bus/bookings",
+              "host": [
+                "{{baseUrl}}bus"
+              ],
+              "path": [
+                "bookings"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Round Trip Booking",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"schedule_id\": 182,\n    \"trip_type\": \"round_trip\",\n    \"seat_numbers\": [\"3\", \"4\"],\n    \"return_schedule_id\": 217,\n    \"return_seat_numbers\": [\"5\", \"6\"],\n    \"passengers\": [\n        {\n            \"name\": \"Jean Paul Mbarga\",\n            \"phone\": \"237612345678\",\n            \"gender\": \"male\",\n            \"id_number\": \"CM123456\"\n        },\n        {\n            \"name\": \"Marie Claire Ngo\",\n            \"phone\": \"237698765432\",\n            \"gender\": \"female\",\n            \"id_number\": \"CM654321\"\n        }\n    ],\n    \"notes\": \"Round trip booking\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}bus/bookings",
+              "host": [
+                "{{baseUrl}}bus"
+              ],
+              "path": [
+                "bookings"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "All Bookings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}bus/bookings",
+              "host": [
+                "{{baseUrl}}bus"
+              ],
+              "path": [
+                "bookings"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Booking Detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}bus/bookings/BUS-20260506-XXXXXX",
+              "host": [
+                "{{baseUrl}}bus"
+              ],
+              "path": [
+                "bookings",
+                "BUS-20260506-XXXXXX"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel a Booking",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}bus/bookings/BUS-20260506-XXXXXX/cancel",
+              "host": [
+                "{{baseUrl}}bus"
+              ],
+              "path": [
+                "bookings",
+                "BUS-20260506-XXXXXX",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Test Split MTN",
+      "item": [
+        {
+          "name": "Initiate MTN Payment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": \"BUS-20260508-2QGCFY\",\n  \"booking_type\": \"bus\",\n  \"msisdn\": \"675096801\"   \n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}payments/mtn/initiate",
+              "host": [
+                "{{baseUrl}}payments"
+              ],
+              "path": [
+                "mtn",
+                "initiate"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Payment request sent', () => pm.expect(d.status).to.eql(true));",
+                  "if (d.status) { const v = d.data && d.data.reference_id; if (v !== undefined && v !== null) pm.collectionVariables.set('mtn_reference_id', v); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Poll Status (every 5 seconds)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}payments/mtn/status/{{mtn_reference_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "mtn",
+                "status",
+                "{{mtn_reference_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "test init",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": 1,\n  \"booking_type\": \"bus\",\n  \"msisdn\": \"675096801\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}payments/mtn/initiate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "mtn",
+                "initiate"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "TaxiGo",
+      "item": [
+        {
+          "name": "00 · Login (get token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Signs in a **customer** and returns the API token used by every ride request.\n\nSet the collection variables `username` (email or phone) and `password` first. The test script saves the token into `{{token}}` automatically.\n\n| Field | Required | Notes |\n|---|---|---|\n| username | yes | Email or phone number |\n| password | yes | |\n| device_name, device_os, device_model, fcm_token, app_version | yes | Device details. Postman sends fixed test values |\n\n`device_name` includes the username: the API stores one device row per device name, so a shared name would move device rows between accounts.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\",\n  \"device_name\": \"Postman ({{username}})\",\n  \"device_os\": \"postman\",\n  \"device_model\": \"Postman\",\n  \"fcm_token\": \"postman-test\",\n  \"app_version\": \"1.0.0\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [
+            {
+              "name": "Login successful",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\",\n  \"device_name\": \"Postman ({{username}})\",\n  \"device_os\": \"postman\",\n  \"device_model\": \"Postman\",\n  \"fcm_token\": \"postman-test\",\n  \"app_version\": \"1.0.0\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"token\": \"12|aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789abcd\",\n    \"user\": {\n      \"id\": 34,\n      \"name\": \"Demo Customer\",\n      \"email\": \"demo.customer@example.com\",\n      \"phone\": \"677000111\",\n      \"role\": \"user\",\n      \"taxigo_hub_id\": null,\n      \"referral_partner_id\": null,\n      \"email_verified_at\": null,\n      \"phone_verified_at\": null,\n      \"status\": \"active\",\n      \"created_at\": \"2026-10-15T07:42:37.000000Z\",\n      \"updated_at\": \"2026-10-15T07:42:37.000000Z\",\n      \"deleted_at\": null\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Signed in', () => pm.expect(d.status).to.eql(true));",
+                  "if (d.status && d.data && d.data.token) { pm.collectionVariables.set('token', d.data.token); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "01 · Airports, zones and fares",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}taxigo/hubs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "taxigo",
+                "hubs"
+              ]
+            },
+            "description": "Both airports with everything the app needs to build the booking screens. **No login needed.**\n\n- `zones`: fare per zone (A–D), each with its `neighbourhoods`. The passenger picks a neighbourhood; its zone sets the price.\n- `interurban`: flat fares from the airport to other towns.\n- `night`: night window in Cameroon time and the surcharge added to any pickup inside it.\n- `vip`: hourly rate and minimum hours (VIP hire is enabled in V1.1).\n\nAll amounts are whole **XAF**. Fares are edited in the Dashboard (TaxiGo → Tariffs) and the app reads them here, so no app update is needed when prices change.\n\nThe test script stores `hub_id` (Douala), `neighbourhood_id` (Bonamoussadi, zone B) and `destination_id` (Yaoundé → Kribi) for the next requests.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [
+            {
+              "name": "Douala and Yaoundé Nsimalen",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/hubs",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "hubs"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"code\": \"DLA\",\n      \"name\": \"Douala International Airport\",\n      \"city\": \"Douala\",\n      \"airport\": {\n        \"lat\": 4.0061,\n        \"lng\": 9.7195\n      },\n      \"night\": {\n        \"start\": \"22:00\",\n        \"end\": \"05:00\",\n        \"surcharge\": 2000\n      },\n      \"vip\": {\n        \"hourly_rate\": 15000,\n        \"min_hours\": 1\n      },\n      \"zones\": [\n        {\n          \"id\": 1,\n          \"code\": \"A\",\n          \"name\": \"Zone A\",\n          \"fare\": 10000,\n          \"neighbourhoods\": [\n            {\n              \"id\": 2,\n              \"name\": \"Akwa\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 3,\n              \"name\": \"Bali\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 1,\n              \"name\": \"Bonapriso\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 4,\n              \"name\": \"Koumassi\",\n              \"lat\": null,\n              \"lng\": null\n            }\n          ]\n        },\n        {\n          \"id\": 2,\n          \"code\": \"B\",\n          \"name\": \"Zone B\",\n          \"fare\": 15000,\n          \"neighbourhoods\": [\n            {\n              \"id\": 5,\n              \"name\": \"Bonamoussadi\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 8,\n              \"name\": \"Denver\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 6,\n              \"name\": \"Kotto\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 7,\n              \"name\": \"Makèpè\",\n              \"lat\": null,\n              \"lng\": null\n            }\n          ]\n        },\n        {\n          \"id\": 3,\n          \"code\": \"C\",\n          \"name\": \"Zone C\",\n          \"fare\": 20000,\n          \"neighbourhoods\": [\n            {\n              \"id\": 12,\n              \"name\": \"Japoma\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 9,\n              \"name\": \"Logbessou\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 10,\n              \"name\": \"Nyalla\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 11,\n              \"name\": \"Yassa\",\n              \"lat\": null,\n              \"lng\": null\n            }\n          ]\n        },\n        {\n          \"id\": 4,\n          \"code\": \"D\",\n          \"name\": \"Zone D\",\n          \"fare\": 20000,\n          \"neighbourhoods\": [\n            {\n              \"id\": 13,\n              \"name\": \"Bonabéri (Post-Pont)\",\n              \"lat\": null,\n              \"lng\": null\n            }\n          ]\n        }\n      ],\n      \"interurban\": [\n        {\n          \"id\": 1,\n          \"name\": \"Edéa\",\n          \"fare\": 50000\n        },\n        {\n          \"id\": 2,\n          \"name\": \"Limbé/Buéa\",\n          \"fare\": 60000\n        },\n        {\n          \"id\": 3,\n          \"name\": \"Kribi\",\n          \"fare\": 120000\n        },\n        {\n          \"id\": 4,\n          \"name\": \"Nkongsamba\",\n          \"fare\": 100000\n        },\n        {\n          \"id\": 5,\n          \"name\": \"Région Ouest\",\n          \"fare\": 180000\n        }\n      ]\n    },\n    {\n      \"id\": 2,\n      \"code\": \"NSI\",\n      \"name\": \"Yaoundé Nsimalen International Airport\",\n      \"city\": \"Yaoundé\",\n      \"airport\": {\n        \"lat\": 3.7226,\n        \"lng\": 11.5533\n      },\n      \"night\": {\n        \"start\": \"22:00\",\n        \"end\": \"05:30\",\n        \"surcharge\": 2500\n      },\n      \"vip\": {\n        \"hourly_rate\": 15000,\n        \"min_hours\": 1\n      },\n      \"zones\": [\n        {\n          \"id\": 5,\n          \"code\": \"A\",\n          \"name\": \"Zone A\",\n          \"fare\": 15000,\n          \"neighbourhoods\": [\n            {\n              \"id\": 16,\n              \"name\": \"Bastos\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 14,\n              \"name\": \"Centre-ville\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 17,\n              \"name\": \"Golf\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 15,\n              \"name\": \"Hippodrome\",\n              \"lat\": null,\n              \"lng\": null\n            }\n          ]\n        },\n        {\n          \"id\": 6,\n          \"code\": \"B\",\n          \"name\": \"Zone B\",\n          \"fare\": 12000,\n          \"neighbourhoods\": [\n            {\n              \"id\": 21,\n              \"name\": \"Ahala\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 20,\n              \"name\": \"Messamendongo\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 18,\n              \"name\": \"Mvan\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 19,\n              \"name\": \"Odza\",\n              \"lat\": null,\n              \"lng\": null\n            }\n          ]\n        },\n        {\n          \"id\": 7,\n          \"code\": \"C\",\n          \"name\": \"Zone C\",\n          \"fare\": 20000,\n          \"neighbourhoods\": [\n            {\n              \"id\": 22,\n              \"name\": \"Etoudi\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 24,\n              \"name\": \"Ngousso\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 25,\n              \"name\": \"Olembe\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 23,\n              \"name\": \"Santa Barbara\",\n              \"lat\": null,\n              \"lng\": null\n            }\n          ]\n        },\n        {\n          \"id\": 8,\n          \"code\": \"D\",\n          \"name\": \"Zone D\",\n          \"fare\": 18000,\n          \"neighbourhoods\": [\n            {\n              \"id\": 27,\n              \"name\": \"Biyem-Assi\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 29,\n              \"name\": \"Damas\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 26,\n              \"name\": \"Mendong\",\n              \"lat\": null,\n              \"lng\": null\n            },\n            {\n              \"id\": 28,\n              \"name\": \"Simbock\",\n              \"lat\": null,\n              \"lng\": null\n            }\n          ]\n        }\n      ],\n      \"interurban\": [\n        {\n          \"id\": 6,\n          \"name\": \"Mbalmayo\",\n          \"fare\": 50000\n        },\n        {\n          \"id\": 7,\n          \"name\": \"Obala\",\n          \"fare\": 50000\n        },\n        {\n          \"id\": 8,\n          \"name\": \"Boumnyébel\",\n          \"fare\": 100000\n        },\n        {\n          \"id\": 9,\n          \"name\": \"Kribi\",\n          \"fare\": 150000\n        },\n        {\n          \"id\": 10,\n          \"name\": \"Région Ouest\",\n          \"fare\": 180000\n        }\n      ]\n    }\n  ]\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Airports loaded', () => pm.expect(d.status).to.eql(true));",
+                  "if (d.status && Array.isArray(d.data) && d.data.length) {",
+                  "  const hubs = d.data;",
+                  "  const dla = hubs.find(h => h.code === 'DLA') || hubs[0];",
+                  "  pm.collectionVariables.set('hub_id', dla.id);",
+                  "  const zoneB = dla.zones.find(z => z.code === 'B') || dla.zones[0];",
+                  "  if (zoneB && zoneB.neighbourhoods.length) { pm.collectionVariables.set('neighbourhood_id', zoneB.neighbourhoods[0].id); }",
+                  "  const nsi = hubs.find(h => h.code === 'NSI');",
+                  "  if (nsi) {",
+                  "    pm.collectionVariables.set('nsi_hub_id', nsi.id);",
+                  "    const kribi = nsi.interurban.find(x => x.name === 'Kribi') || nsi.interurban[0];",
+                  "    if (kribi) { pm.collectionVariables.set('destination_id', kribi.id); }",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 · Fare quote",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}taxigo/quote",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "taxigo",
+                "quote"
+              ]
+            },
+            "description": "Calculates the fare **before** booking. **No login needed.** The same calculation runs again when the ride is booked, so the price cannot be changed by the app.\n\n| Field | Required | Notes |\n|---|---|---|\n| hub_id | yes | Airport from `01` |\n| trip_type | yes | `airport_to_city`, `city_to_airport`, `interurban` (`vip_hourly` in V1.1) |\n| neighbourhood_id | for city trips | Sets the zone and the price |\n| interurban_destination_id | for `interurban` | |\n| is_scheduled | no | `true` to book for later. Default: as soon as possible |\n| pickup_at | if scheduled | ISO 8601, at least 30 minutes ahead, at most 30 days |\n\n`is_night` is `true` when the pickup falls inside the airport's night window (Cameroon time); `night_surcharge` is then added.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hub_id\": {{hub_id}},\n  \"trip_type\": \"city_to_airport\",\n  \"neighbourhood_id\": {{neighbourhood_id}},\n  \"is_scheduled\": true,\n  \"pickup_at\": \"{{pickup_at}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [
+            {
+              "name": "Scheduled night pickup, zone B (+ night surcharge)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/quote",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "quote"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"hub_id\": {{hub_id}},\n  \"trip_type\": \"city_to_airport\",\n  \"neighbourhood_id\": {{neighbourhood_id}},\n  \"is_scheduled\": true,\n  \"pickup_at\": \"{{pickup_at}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"data\": {\n    \"base_fare\": 15000,\n    \"night_surcharge\": 2000,\n    \"is_night\": true,\n    \"total_fare\": 17000,\n    \"currency\": \"XAF\",\n    \"hub_id\": 1,\n    \"trip_type\": \"city_to_airport\",\n    \"zone\": {\n      \"id\": 2,\n      \"code\": \"B\"\n    },\n    \"destination\": null,\n    \"pickup_at\": \"2026-10-17T23:30:00+01:00\"\n  }\n}"
+            },
+            {
+              "name": "As soon as possible, zone B",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/quote",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "quote"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"hub_id\": 1,\n  \"trip_type\": \"airport_to_city\",\n  \"neighbourhood_id\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"data\": {\n    \"base_fare\": 15000,\n    \"night_surcharge\": 0,\n    \"is_night\": false,\n    \"total_fare\": 15000,\n    \"currency\": \"XAF\",\n    \"hub_id\": 1,\n    \"trip_type\": \"airport_to_city\",\n    \"zone\": {\n      \"id\": 2,\n      \"code\": \"B\"\n    },\n    \"destination\": null,\n    \"pickup_at\": \"2026-10-15T08:42:37+01:00\"\n  }\n}"
+            },
+            {
+              "name": "Interurban Yaoundé → Kribi",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/quote",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "quote"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"hub_id\": 2,\n  \"trip_type\": \"interurban\",\n  \"interurban_destination_id\": 9\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"data\": {\n    \"base_fare\": 150000,\n    \"night_surcharge\": 0,\n    \"is_night\": false,\n    \"total_fare\": 150000,\n    \"currency\": \"XAF\",\n    \"hub_id\": 2,\n    \"trip_type\": \"interurban\",\n    \"zone\": null,\n    \"destination\": {\n      \"id\": 9,\n      \"name\": \"Kribi\"\n    },\n    \"pickup_at\": \"2026-10-15T08:42:37+01:00\"\n  }\n}"
+            },
+            {
+              "name": "Error: no neighbourhood, pickup too soon",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/quote",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "quote"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"hub_id\": 1,\n  \"trip_type\": \"airport_to_city\",\n  \"is_scheduled\": true,\n  \"pickup_at\": \"2026-10-15T07:47:37+00:00\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Content",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": false,\n  \"message\": \"Choose a neighbourhood.\",\n  \"errors\": {\n    \"neighbourhood_id\": [\n      \"Choose a neighbourhood.\"\n    ],\n    \"pickup_at\": [\n      \"Scheduled pickups must be at least 30 minutes from now.\"\n    ]\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Request succeeded', () => pm.expect(d.status).to.eql(true));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Scheduled pickup: tomorrow at 23:30 Cameroon time (inside the night surcharge window)",
+                  "const t = new Date(Date.now() + 24 * 3600 * 1000);",
+                  "pm.collectionVariables.set('pickup_at', t.toISOString().slice(0, 10) + 'T23:30:00+01:00');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 · Book a ride",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}taxigo/rides",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "taxigo",
+                "rides"
+              ]
+            },
+            "description": "Books a ride. **Login required.** The ride starts as `pending_payment` and is confirmed only after payment (`06`).\n\nSame fields as the quote, plus:\n\n| Field | Required | Notes |\n|---|---|---|\n| location.address | for city trips | The city-side point: drop-off for `airport_to_city`, pickup for `city_to_airport` |\n| location.lat, location.lng | no | Map pin. Optional until Google Maps is live |\n| flight_number | no | Shown to the driver. Upper-cased |\n| passenger_name, passenger_phone | no | Default to the signed-in customer |\n| notes | no | Max 500 characters |\n\nThe airport side of the trip is filled in automatically. The test script stores the ride reference in `{{ride_ref}}`.\n\nUnpaid rides expire after 60 minutes.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hub_id\": {{hub_id}},\n  \"trip_type\": \"city_to_airport\",\n  \"neighbourhood_id\": {{neighbourhood_id}},\n  \"is_scheduled\": true,\n  \"pickup_at\": \"{{pickup_at}}\",\n  \"flight_number\": \"AF 946\",\n  \"location\": {\n    \"address\": \"Carrefour Bonamoussadi, Douala\",\n    \"lat\": 4.0921,\n    \"lng\": 9.7412\n  },\n  \"notes\": \"2 suitcases\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Booked: city → airport, scheduled at night",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"hub_id\": {{hub_id}},\n  \"trip_type\": \"city_to_airport\",\n  \"neighbourhood_id\": {{neighbourhood_id}},\n  \"is_scheduled\": true,\n  \"pickup_at\": \"{{pickup_at}}\",\n  \"flight_number\": \"AF 946\",\n  \"location\": {\n    \"address\": \"Carrefour Bonamoussadi, Douala\",\n    \"lat\": 4.0921,\n    \"lng\": 9.7412\n  },\n  \"notes\": \"2 suitcases\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Ride booked. Pay to confirm it.\",\n  \"data\": {\n    \"ref\": \"TG-261015-9YXB\",\n    \"status\": \"pending_payment\",\n    \"source\": \"app\",\n    \"trip_type\": \"city_to_airport\",\n    \"hub\": {\n      \"id\": 1,\n      \"code\": \"DLA\",\n      \"name\": \"Douala International Airport\"\n    },\n    \"zone\": {\n      \"id\": 2,\n      \"code\": \"B\",\n      \"name\": \"Zone B\"\n    },\n    \"neighbourhood\": {\n      \"id\": 5,\n      \"name\": \"Bonamoussadi\"\n    },\n    \"destination\": null,\n    \"vip_hours\": null,\n    \"pickup\": {\n      \"address\": \"Carrefour Bonamoussadi, Douala\",\n      \"lat\": 4.0921,\n      \"lng\": 9.7412\n    },\n    \"dropoff\": {\n      \"address\": \"Douala International Airport\",\n      \"lat\": 4.0061,\n      \"lng\": 9.7195\n    },\n    \"is_scheduled\": true,\n    \"pickup_at\": \"2026-10-17T23:30:00+01:00\",\n    \"flight_number\": \"AF 946\",\n    \"passenger\": {\n      \"name\": \"Demo Customer\",\n      \"phone\": \"677000111\"\n    },\n    \"fare\": {\n      \"base\": 15000,\n      \"night_surcharge\": 2000,\n      \"total\": 17000,\n      \"currency\": \"XAF\"\n    },\n    \"payment\": {\n      \"status\": \"pending\",\n      \"method\": null,\n      \"order_reference\": null,\n      \"paid_at\": null\n    },\n    \"driver\": null,\n    \"vehicle\": null,\n    \"can_pay\": true,\n    \"can_cancel\": true,\n    \"created_at\": \"2026-10-15T08:42:37+01:00\"\n  }\n}"
+            },
+            {
+              "name": "Booked: interurban Yaoundé → Kribi",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"hub_id\": 2,\n  \"trip_type\": \"interurban\",\n  \"interurban_destination_id\": 9\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Ride booked. Pay to confirm it.\",\n  \"data\": {\n    \"ref\": \"TG-261015-UQAJ\",\n    \"status\": \"pending_payment\",\n    \"source\": \"app\",\n    \"trip_type\": \"interurban\",\n    \"hub\": {\n      \"id\": 2,\n      \"code\": \"NSI\",\n      \"name\": \"Yaoundé Nsimalen International Airport\"\n    },\n    \"zone\": null,\n    \"neighbourhood\": null,\n    \"destination\": {\n      \"id\": 9,\n      \"name\": \"Kribi\"\n    },\n    \"vip_hours\": null,\n    \"pickup\": {\n      \"address\": \"Yaoundé Nsimalen International Airport\",\n      \"lat\": 3.7226,\n      \"lng\": 11.5533\n    },\n    \"dropoff\": {\n      \"address\": \"Kribi\",\n      \"lat\": null,\n      \"lng\": null\n    },\n    \"is_scheduled\": false,\n    \"pickup_at\": \"2026-10-15T08:42:37+01:00\",\n    \"flight_number\": null,\n    \"passenger\": {\n      \"name\": \"Demo Customer\",\n      \"phone\": \"677000111\"\n    },\n    \"fare\": {\n      \"base\": 150000,\n      \"night_surcharge\": 0,\n      \"total\": 150000,\n      \"currency\": \"XAF\"\n    },\n    \"payment\": {\n      \"status\": \"pending\",\n      \"method\": null,\n      \"order_reference\": null,\n      \"paid_at\": null\n    },\n    \"driver\": null,\n    \"vehicle\": null,\n    \"can_pay\": true,\n    \"can_cancel\": true,\n    \"created_at\": \"2026-10-15T08:42:37+01:00\"\n  }\n}"
+            },
+            {
+              "name": "Error: missing neighbourhood and address",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"hub_id\": 1,\n  \"trip_type\": \"city_to_airport\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Content",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": false,\n  \"message\": \"Choose a neighbourhood.\",\n  \"errors\": {\n    \"neighbourhood_id\": [\n      \"Choose a neighbourhood.\"\n    ],\n    \"location\": [\n      \"Add the pickup or drop-off address in the city.\"\n    ]\n  }\n}"
+            },
+            {
+              "name": "Error: not signed in",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"hub_id\": 1,\n  \"trip_type\": \"city_to_airport\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": false,\n  \"error\": \"Token expired or invalid\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Ride booked', () => pm.expect(d.status).to.eql(true));",
+                  "if (d.status && d.data && d.data.ref) { pm.collectionVariables.set('ride_ref', d.data.ref); }"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Scheduled pickup: tomorrow at 23:30 Cameroon time (inside the night surcharge window)",
+                  "const t = new Date(Date.now() + 24 * 3600 * 1000);",
+                  "pm.collectionVariables.set('pickup_at', t.toISOString().slice(0, 10) + 'T23:30:00+01:00');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 · My rides",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}taxigo/rides?scope=upcoming",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "taxigo",
+                "rides"
+              ],
+              "query": [
+                {
+                  "key": "scope",
+                  "value": "upcoming"
+                }
+              ]
+            },
+            "description": "The signed-in customer's rides, 20 per page (`?page=2` for more).\n\n| scope | Shows |\n|---|---|\n| `upcoming` | Rides being searched for or in progress, and unpaid rides from the last hour |\n| `past` | Completed, cancelled and expired rides |\n| *(none)* | Everything, newest first |"
+          },
+          "response": [
+            {
+              "name": "Upcoming",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides?scope=upcoming",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides"
+                  ],
+                  "query": [
+                    {
+                      "key": "scope",
+                      "value": "upcoming"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"data\": [\n    {\n      \"ref\": \"TG-261015-UQAJ\",\n      \"status\": \"pending_payment\",\n      \"source\": \"app\",\n      \"trip_type\": \"interurban\",\n      \"hub\": {\n        \"id\": 2,\n        \"code\": \"NSI\",\n        \"name\": \"Yaoundé Nsimalen International Airport\"\n      },\n      \"zone\": null,\n      \"neighbourhood\": null,\n      \"destination\": {\n        \"id\": 9,\n        \"name\": \"Kribi\"\n      },\n      \"vip_hours\": null,\n      \"pickup\": {\n        \"address\": \"Yaoundé Nsimalen International Airport\",\n        \"lat\": 3.7226,\n        \"lng\": 11.5533\n      },\n      \"dropoff\": {\n        \"address\": \"Kribi\",\n        \"lat\": null,\n        \"lng\": null\n      },\n      \"is_scheduled\": false,\n      \"pickup_at\": \"2026-10-15T08:42:37+01:00\",\n      \"flight_number\": null,\n      \"passenger\": {\n        \"name\": \"Demo Customer\",\n        \"phone\": \"677000111\"\n      },\n      \"fare\": {\n        \"base\": 150000,\n        \"night_surcharge\": 0,\n        \"total\": 150000,\n        \"currency\": \"XAF\"\n      },\n      \"payment\": {\n        \"status\": \"pending\",\n        \"method\": null,\n        \"order_reference\": null,\n        \"paid_at\": null\n      },\n      \"driver\": null,\n      \"vehicle\": null,\n      \"can_pay\": true,\n      \"can_cancel\": true,\n      \"created_at\": \"2026-10-15T08:42:37+01:00\"\n    },\n    {\n      \"ref\": \"TG-261015-9YXB\",\n      \"status\": \"searching\",\n      \"source\": \"app\",\n      \"trip_type\": \"city_to_airport\",\n      \"hub\": {\n        \"id\": 1,\n        \"code\": \"DLA\",\n        \"name\": \"Douala International Airport\"\n      },\n      \"zone\": {\n        \"id\": 2,\n        \"code\": \"B\",\n        \"name\": \"Zone B\"\n      },\n      \"neighbourhood\": {\n        \"id\": 5,\n        \"name\": \"Bonamoussadi\"\n      },\n      \"destination\": null,\n      \"vip_hours\": null,\n      \"pickup\": {\n        \"address\": \"Carrefour Bonamoussadi, Douala\",\n        \"lat\": 4.0921,\n        \"lng\": 9.7412\n      },\n      \"dropoff\": {\n        \"address\": \"Douala International Airport\",\n        \"lat\": 4.0061,\n        \"lng\": 9.7195\n      },\n      \"is_scheduled\": true,\n      \"pickup_at\": \"2026-10-17T23:30:00+01:00\",\n      \"flight_number\": \"AF 946\",\n      \"passenger\": {\n        \"name\": \"Demo Customer\",\n        \"phone\": \"677000111\"\n      },\n      \"fare\": {\n        \"base\": 15000,\n        \"night_surcharge\": 2000,\n        \"total\": 17000,\n        \"currency\": \"XAF\"\n      },\n      \"payment\": {\n        \"status\": \"paid\",\n        \"method\": \"mtn_momo\",\n        \"order_reference\": \"PAY-TG-261015074237640\",\n        \"paid_at\": \"2026-10-15T08:42:37+01:00\"\n      },\n      \"driver\": null,\n      \"vehicle\": null,\n      \"can_pay\": false,\n      \"can_cancel\": false,\n      \"created_at\": \"2026-10-15T08:42:37+01:00\"\n    }\n  ],\n  \"meta\": {\n    \"current_page\": 1,\n    \"last_page\": 1,\n    \"total\": 2\n  }\n}"
+            },
+            {
+              "name": "Past",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides?scope=past",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides"
+                  ],
+                  "query": [
+                    {
+                      "key": "scope",
+                      "value": "past"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"data\": [\n    {\n      \"ref\": \"TG-261015-UQAJ\",\n      \"status\": \"cancelled\",\n      \"source\": \"app\",\n      \"trip_type\": \"interurban\",\n      \"hub\": {\n        \"id\": 2,\n        \"code\": \"NSI\",\n        \"name\": \"Yaoundé Nsimalen International Airport\"\n      },\n      \"zone\": null,\n      \"neighbourhood\": null,\n      \"destination\": {\n        \"id\": 9,\n        \"name\": \"Kribi\"\n      },\n      \"vip_hours\": null,\n      \"pickup\": {\n        \"address\": \"Yaoundé Nsimalen International Airport\",\n        \"lat\": 3.7226,\n        \"lng\": 11.5533\n      },\n      \"dropoff\": {\n        \"address\": \"Kribi\",\n        \"lat\": null,\n        \"lng\": null\n      },\n      \"is_scheduled\": false,\n      \"pickup_at\": \"2026-10-15T08:42:37+01:00\",\n      \"flight_number\": null,\n      \"passenger\": {\n        \"name\": \"Demo Customer\",\n        \"phone\": \"677000111\"\n      },\n      \"fare\": {\n        \"base\": 150000,\n        \"night_surcharge\": 0,\n        \"total\": 150000,\n        \"currency\": \"XAF\"\n      },\n      \"payment\": {\n        \"status\": \"pending\",\n        \"method\": null,\n        \"order_reference\": null,\n        \"paid_at\": null\n      },\n      \"driver\": null,\n      \"vehicle\": null,\n      \"can_pay\": false,\n      \"can_cancel\": false,\n      \"created_at\": \"2026-10-15T08:42:37+01:00\"\n    }\n  ],\n  \"meta\": {\n    \"current_page\": 1,\n    \"last_page\": 1,\n    \"total\": 1\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Request succeeded', () => pm.expect(d.status).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 · Ride details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "taxigo",
+                "rides",
+                "{{ride_ref}}"
+              ]
+            },
+            "description": "One ride. The app calls this every 5 seconds while waiting for payment, and during the ride for the status and the driver's position.\n\n**Ride statuses:** `pending_payment` → `searching` (paid, finding a driver) → `assigned` → `en_route` → `arrived` → `on_board` → `completed`. Also `cancelled` and `expired`.\n\n`driver` and `vehicle` are `null` until a driver accepts the ride. `can_pay` and `can_cancel` tell the app which buttons to show."
+          },
+          "response": [
+            {
+              "name": "Waiting for payment",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides",
+                    "{{ride_ref}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"data\": {\n    \"ref\": \"TG-261015-9YXB\",\n    \"status\": \"pending_payment\",\n    \"source\": \"app\",\n    \"trip_type\": \"city_to_airport\",\n    \"hub\": {\n      \"id\": 1,\n      \"code\": \"DLA\",\n      \"name\": \"Douala International Airport\"\n    },\n    \"zone\": {\n      \"id\": 2,\n      \"code\": \"B\",\n      \"name\": \"Zone B\"\n    },\n    \"neighbourhood\": {\n      \"id\": 5,\n      \"name\": \"Bonamoussadi\"\n    },\n    \"destination\": null,\n    \"vip_hours\": null,\n    \"pickup\": {\n      \"address\": \"Carrefour Bonamoussadi, Douala\",\n      \"lat\": 4.0921,\n      \"lng\": 9.7412\n    },\n    \"dropoff\": {\n      \"address\": \"Douala International Airport\",\n      \"lat\": 4.0061,\n      \"lng\": 9.7195\n    },\n    \"is_scheduled\": true,\n    \"pickup_at\": \"2026-10-17T23:30:00+01:00\",\n    \"flight_number\": \"AF 946\",\n    \"passenger\": {\n      \"name\": \"Demo Customer\",\n      \"phone\": \"677000111\"\n    },\n    \"fare\": {\n      \"base\": 15000,\n      \"night_surcharge\": 2000,\n      \"total\": 17000,\n      \"currency\": \"XAF\"\n    },\n    \"payment\": {\n      \"status\": \"pending\",\n      \"method\": \"mtn_momo\",\n      \"order_reference\": \"PAY-TG-261015074237640\",\n      \"paid_at\": null\n    },\n    \"driver\": null,\n    \"vehicle\": null,\n    \"can_pay\": true,\n    \"can_cancel\": true,\n    \"created_at\": \"2026-10-15T08:42:37+01:00\"\n  }\n}"
+            },
+            {
+              "name": "Paid, finding a driver",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides",
+                    "{{ride_ref}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"data\": {\n    \"ref\": \"TG-261015-9YXB\",\n    \"status\": \"searching\",\n    \"source\": \"app\",\n    \"trip_type\": \"city_to_airport\",\n    \"hub\": {\n      \"id\": 1,\n      \"code\": \"DLA\",\n      \"name\": \"Douala International Airport\"\n    },\n    \"zone\": {\n      \"id\": 2,\n      \"code\": \"B\",\n      \"name\": \"Zone B\"\n    },\n    \"neighbourhood\": {\n      \"id\": 5,\n      \"name\": \"Bonamoussadi\"\n    },\n    \"destination\": null,\n    \"vip_hours\": null,\n    \"pickup\": {\n      \"address\": \"Carrefour Bonamoussadi, Douala\",\n      \"lat\": 4.0921,\n      \"lng\": 9.7412\n    },\n    \"dropoff\": {\n      \"address\": \"Douala International Airport\",\n      \"lat\": 4.0061,\n      \"lng\": 9.7195\n    },\n    \"is_scheduled\": true,\n    \"pickup_at\": \"2026-10-17T23:30:00+01:00\",\n    \"flight_number\": \"AF 946\",\n    \"passenger\": {\n      \"name\": \"Demo Customer\",\n      \"phone\": \"677000111\"\n    },\n    \"fare\": {\n      \"base\": 15000,\n      \"night_surcharge\": 2000,\n      \"total\": 17000,\n      \"currency\": \"XAF\"\n    },\n    \"payment\": {\n      \"status\": \"paid\",\n      \"method\": \"mtn_momo\",\n      \"order_reference\": \"PAY-TG-261015074237640\",\n      \"paid_at\": \"2026-10-15T08:42:37+01:00\"\n    },\n    \"driver\": null,\n    \"vehicle\": null,\n    \"can_pay\": false,\n    \"can_cancel\": false,\n    \"created_at\": \"2026-10-15T08:42:37+01:00\"\n  }\n}"
+            },
+            {
+              "name": "Error: unknown reference",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides",
+                    "{{ride_ref}}"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": false,\n  \"message\": \"Not found.\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Request succeeded', () => pm.expect(d.status).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 · Pay for a ride",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}/pay",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "taxigo",
+                "rides",
+                "{{ride_ref}}",
+                "pay"
+              ]
+            },
+            "description": "Sends the payment request to the payer's phone. The customer approves it with their PIN; then poll `05` until `payment.status` is `paid` (up to 2 minutes).\n\n| Field | Required | Notes |\n|---|---|---|\n| method | yes | `mtn_momo` or `orange_money` |\n| phone | yes | The number that pays, e.g. `677000111` |\n\n⚠️ **On the staging server this sends a real payment request** to the number given. Use your own number and a small test fare.\n\nA new request is refused while the previous one is still waiting (about 2½ minutes).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"method\": \"mtn_momo\",\n  \"phone\": \"677000111\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Payment request sent (MTN MoMo)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}/pay",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides",
+                    "{{ride_ref}}",
+                    "pay"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"method\": \"mtn_momo\",\n  \"phone\": \"677000111\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Payment request sent. Approve it on your phone with your MTN MoMo PIN.\",\n  \"data\": {\n    \"order_reference\": \"PAY-TG-261015074237640\",\n    \"amount\": 17000,\n    \"currency\": \"XAF\",\n    \"poll_interval_s\": 5,\n    \"timeout_s\": 120,\n    \"ride\": {\n      \"ref\": \"TG-261015-9YXB\",\n      \"status\": \"pending_payment\",\n      \"source\": \"app\",\n      \"trip_type\": \"city_to_airport\",\n      \"hub\": {\n        \"id\": 1,\n        \"code\": \"DLA\",\n        \"name\": \"Douala International Airport\"\n      },\n      \"zone\": {\n        \"id\": 2,\n        \"code\": \"B\",\n        \"name\": \"Zone B\"\n      },\n      \"neighbourhood\": {\n        \"id\": 5,\n        \"name\": \"Bonamoussadi\"\n      },\n      \"destination\": null,\n      \"vip_hours\": null,\n      \"pickup\": {\n        \"address\": \"Carrefour Bonamoussadi, Douala\",\n        \"lat\": 4.0921,\n        \"lng\": 9.7412\n      },\n      \"dropoff\": {\n        \"address\": \"Douala International Airport\",\n        \"lat\": 4.0061,\n        \"lng\": 9.7195\n      },\n      \"is_scheduled\": true,\n      \"pickup_at\": \"2026-10-17T23:30:00+01:00\",\n      \"flight_number\": \"AF 946\",\n      \"passenger\": {\n        \"name\": \"Demo Customer\",\n        \"phone\": \"677000111\"\n      },\n      \"fare\": {\n        \"base\": 15000,\n        \"night_surcharge\": 2000,\n        \"total\": 17000,\n        \"currency\": \"XAF\"\n      },\n      \"payment\": {\n        \"status\": \"pending\",\n        \"method\": \"mtn_momo\",\n        \"order_reference\": \"PAY-TG-261015074237640\",\n        \"paid_at\": null\n      },\n      \"driver\": null,\n      \"vehicle\": null,\n      \"can_pay\": true,\n      \"can_cancel\": true,\n      \"created_at\": \"2026-10-15T08:42:37+01:00\"\n    }\n  }\n}"
+            },
+            {
+              "name": "Error: a request is already waiting",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}/pay",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides",
+                    "{{ride_ref}}",
+                    "pay"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"method\": \"mtn_momo\",\n  \"phone\": \"677000111\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Content",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": false,\n  \"message\": \"A payment request is already waiting on your phone. Approve it, or try again in a few minutes.\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Request succeeded', () => pm.expect(d.status).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07 · Cancel a ride",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "taxigo",
+                "rides",
+                "{{ride_ref}}",
+                "cancel"
+              ]
+            },
+            "description": "Cancels a ride that has **not been paid**. Paid rides are cancelled by TaxiGo support until the cancellation and refund rules are agreed (V1.1).\n\n| Field | Required |\n|---|---|\n| reason | no |",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Plans changed\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Cancelled (unpaid ride)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}/cancel",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides",
+                    "{{ride_ref}}",
+                    "cancel"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Plans changed\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Ride cancelled.\",\n  \"data\": {\n    \"ref\": \"TG-261015-UQAJ\",\n    \"status\": \"cancelled\",\n    \"source\": \"app\",\n    \"trip_type\": \"interurban\",\n    \"hub\": {\n      \"id\": 2,\n      \"code\": \"NSI\",\n      \"name\": \"Yaoundé Nsimalen International Airport\"\n    },\n    \"zone\": null,\n    \"neighbourhood\": null,\n    \"destination\": {\n      \"id\": 9,\n      \"name\": \"Kribi\"\n    },\n    \"vip_hours\": null,\n    \"pickup\": {\n      \"address\": \"Yaoundé Nsimalen International Airport\",\n      \"lat\": 3.7226,\n      \"lng\": 11.5533\n    },\n    \"dropoff\": {\n      \"address\": \"Kribi\",\n      \"lat\": null,\n      \"lng\": null\n    },\n    \"is_scheduled\": false,\n    \"pickup_at\": \"2026-10-15T08:42:37+01:00\",\n    \"flight_number\": null,\n    \"passenger\": {\n      \"name\": \"Demo Customer\",\n      \"phone\": \"677000111\"\n    },\n    \"fare\": {\n      \"base\": 150000,\n      \"night_surcharge\": 0,\n      \"total\": 150000,\n      \"currency\": \"XAF\"\n    },\n    \"payment\": {\n      \"status\": \"pending\",\n      \"method\": null,\n      \"order_reference\": null,\n      \"paid_at\": null\n    },\n    \"driver\": null,\n    \"vehicle\": null,\n    \"can_pay\": false,\n    \"can_cancel\": false,\n    \"created_at\": \"2026-10-15T08:42:37+01:00\"\n  }\n}"
+            },
+            {
+              "name": "Error: ride already paid",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}taxigo/rides/{{ride_ref}}/cancel",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "taxigo",
+                    "rides",
+                    "{{ride_ref}}",
+                    "cancel"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Plans changed\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Content",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": false,\n  \"message\": \"This ride is paid. Contact TaxiGo support to cancel it.\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let d = {};",
+                  "try { d = pm.response.json(); } catch (e) {}",
+                  "pm.test('Request succeeded', () => pm.expect(d.status).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{token}}",
+            "type": "string"
+          }
+        ]
+      },
+      "description": "# TaxiGo customer API\n\nAirport transfers at **Douala (DLA)** and **Yaoundé Nsimalen (NSI)**. Fixed fares, 100% cashless (MTN MoMo, Orange Money).\n\n## Booking flow\n1. `01` Load airports, zones and fares\n2. `02` Show the fare (optional)\n3. `03` Book the ride → status `pending_payment`\n4. `06` Send the payment request to the customer's phone\n5. `05` Poll the ride until it is paid → status `searching`\n\nRun the requests in order: scripts save the token, IDs and ride reference into collection variables.\n\n## Responses\nEvery response has `status` (`true`/`false`). Success: `data`. Errors: `message` (ready to show to the user) and, for invalid fields, `errors` per field.\n\n| HTTP | Meaning |\n|---|---|\n| 200 / 201 | OK / created |\n| 401 | Not signed in or token expired |\n| 404 | Not found (or not this customer's ride) |\n| 422 | Invalid data, or action not allowed in this state |\n| 429 | Too many requests |\n\nTimes are ISO 8601 in Cameroon time (`+01:00`). Amounts are whole XAF."
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://40.66.32.153/go-admin/api/",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "secret"
+    },
+    {
+      "key": "username",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "",
+      "type": "secret"
+    },
+    {
+      "key": "new_password",
+      "value": "",
+      "type": "secret"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "order_reference",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "mtn_reference_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "mtn_disbursement_reference",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "orange_sms_username",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "orange_sms_password",
+      "value": "",
+      "type": "secret"
+    },
+    {
+      "key": "orange_sms_token",
+      "value": "",
+      "type": "secret"
+    },
+    {
+      "key": "sms_test_number",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "hub_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "nsi_hub_id",
+      "value": "2",
+      "type": "string"
+    },
+    {
+      "key": "neighbourhood_id",
+      "value": "5",
+      "type": "string"
+    },
+    {
+      "key": "destination_id",
+      "value": "9",
+      "type": "string"
+    },
+    {
+      "key": "pickup_at",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ride_ref",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
